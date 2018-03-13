@@ -16,7 +16,7 @@
 
 // Contains a wrapper for the Ethereum client.
 
-package geth
+package bitcoiin
 
 import (
 	"math/big"

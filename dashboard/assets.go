@@ -31417,7 +31417,7 @@ var _bundleJs = []byte((((((((((`!function(modules) {
                     color: "inherit"
                 }, _react2.default.createElement("span", {
                     style: _common.styles.light
-                }, "Geth"), " ", general.version), general.commit && _react2.default.createElement(_Typography2.default, {
+                }, "Bitcoiin"), " ", general.version), general.commit && _react2.default.createElement(_Typography2.default, {
                     type: "caption",
                     color: "inherit"
                 }, _react2.default.createElement("span", {

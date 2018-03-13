@@ -73,15 +73,15 @@ func TestIPCPathResolution(t *testing.T) {
 	}{
 		{"", "", false, ""},
 		{"data", "", false, ""},
-		{"", "geth.ipc", false, filepath.Join(os.TempDir(), "geth.ipc")},
-		{"data", "geth.ipc", false, "data/geth.ipc"},
-		{"data", "./geth.ipc", false, "./geth.ipc"},
-		{"data", "/geth.ipc", false, "/geth.ipc"},
+		{"", "bitcoiin.ipc", false, filepath.Join(os.TempDir(), "bitcoiin.ipc")},
+		{"data", "bitcoiin.ipc", false, "data/bitcoiin.ipc"},
+		{"data", "./bitcoiin.ipc", false, "./bitcoiin.ipc"},
+		{"data", "/bitcoiin.ipc", false, "/bitcoiin.ipc"},
 		{"", "", true, ``},
 		{"data", "", true, ``},
-		{"", "geth.ipc", true, `\\.\pipe\geth.ipc`},
-		{"data", "geth.ipc", true, `\\.\pipe\geth.ipc`},
-		{"data", `\\.\pipe\geth.ipc`, true, `\\.\pipe\geth.ipc`},
+		{"", "bitcoiin.ipc", true, `\\.\pipe\bitcoiin.ipc`},
+		{"data", "bitcoiin.ipc", true, `\\.\pipe\bitcoiin.ipc`},
+		{"data", `\\.\pipe\bitcoiin.ipc`, true, `\\.\pipe\bitcoiin.ipc`},
 	}
 	for i, test := range tests {
 		// Only run when platform/test match
