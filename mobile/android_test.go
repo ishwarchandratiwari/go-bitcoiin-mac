@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-package bitcoiin
+package bitcoiinGo
 
 import (
 	"io/ioutil"
@@ -40,14 +40,14 @@ import android.test.MoreAsserts;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import org.ethereum.bitcoiin.*;
+import org.ethereum.bitcoiinGo.*;
 
 public class AndroidTest extends InstrumentationTestCase {
 	public AndroidTest() {}
 
 	public void testAccountManagement() {
 		// Create an encrypted keystore with light crypto parameters.
-		KeyStore ks = new KeyStore(getInstrumentation().getContext().getFilesDir() + "/keystore", Bitcoiin.LightScryptN, Bitcoiin.LightScryptP);
+		KeyStore ks = new KeyStore(getInstrumentation().getContext().getFilesDir() + "/keystore", BitcoiinGo.LightScryptN, BitcoiinGo.LightScryptP);
 
 		try {
 			// Create a new account with the specified encryption passphrase.
@@ -184,7 +184,7 @@ func TestAndroid(t *testing.T) {
 		t.Logf("initialization took %v", time.Since(start))
 	}
 	// Create and switch to a temporary workspace
-	workspace, err := ioutil.TempDir("", "bitcoiin-android-")
+	workspace, err := ioutil.TempDir("", "bitcoiinGo-android-")
 	if err != nil {
 		t.Fatalf("failed to create temporary workspace: %v", err)
 	}
@@ -200,21 +200,21 @@ func TestAndroid(t *testing.T) {
 	defer os.Chdir(pwd)
 
 	// Create the skeleton of the Android project
-	for _, dir := range []string{"src/main", "src/androidTest/java/org/ethereum/bitcoiintest", "libs"} {
+	for _, dir := range []string{"src/main", "src/androidTest/java/org/ethereum/bitcoiinGotest", "libs"} {
 		err = os.MkdirAll(dir, os.ModePerm)
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
-	// Generate the mobile bindings for Bitcoiin and add the tester class
+	// Generate the mobile bindings for BitcoiinGo and add the tester class
 	gobind := exec.Command("gomobile", "bind", "-javapkg", "org.ethereum", "github.com/ethereum/go-ethereum/mobile")
 	if output, err := gobind.CombinedOutput(); err != nil {
 		t.Logf("%s", output)
 		t.Fatalf("failed to run gomobile bind: %v", err)
 	}
-	build.CopyFile(filepath.Join("libs", "bitcoiin.aar"), "bitcoiin.aar", os.ModePerm)
+	build.CopyFile(filepath.Join("libs", "bitcoiinGo.aar"), "bitcoiinGo.aar", os.ModePerm)
 
-	if err = ioutil.WriteFile(filepath.Join("src", "androidTest", "java", "org", "ethereum", "bitcoiintest", "AndroidTest.java"), []byte(androidTestClass), os.ModePerm); err != nil {
+	if err = ioutil.WriteFile(filepath.Join("src", "androidTest", "java", "org", "ethereum", "bitcoiinGotest", "AndroidTest.java"), []byte(androidTestClass), os.ModePerm); err != nil {
 		t.Fatalf("failed to write Android test class: %v", err)
 	}
 	// Finish creating the project and run the tests via gradle
@@ -232,7 +232,7 @@ func TestAndroid(t *testing.T) {
 
 const androidManifest = `<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.ethereum.bitcoiintest"
+          package="org.ethereum.bitcoiinGotest"
 	  android:versionCode="1"
 	  android:versionName="1.0">
 
@@ -261,6 +261,6 @@ repositories {
 }
 dependencies {
     compile 'com.android.support:appcompat-v7:19.0.0'
-    compile(name: "bitcoiin", ext: "aar")
+    compile(name: "bitcoiinGo", ext: "aar")
 }
 `

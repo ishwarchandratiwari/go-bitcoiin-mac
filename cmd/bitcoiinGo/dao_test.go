@@ -106,21 +106,21 @@ func testDAOForkBlockNewChain(t *testing.T, test int, genesis string, expectBloc
 	datadir := tmpdir(t)
 	defer os.RemoveAll(datadir)
 
-	// Start a Bitcoiin instance with the requested flags set and immediately terminate
+	// Start a BitcoiinGo instance with the requested flags set and immediately terminate
 	if genesis != "" {
 		json := filepath.Join(datadir, "genesis.json")
 		if err := ioutil.WriteFile(json, []byte(genesis), 0600); err != nil {
 			t.Fatalf("test %d: failed to write genesis file: %v", test, err)
 		}
-		runBitcoiin(t, "--datadir", datadir, "init", json).WaitExit()
+		runBitcoiinGo(t, "--datadir", datadir, "init", json).WaitExit()
 	} else {
 		// Force chain initialization
 		args := []string{"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none", "--ipcdisable", "--datadir", datadir}
-		bitcoiin := runBitcoiin(t, append(args, []string{"--exec", "2+2", "console"}...)...)
-		bitcoiin.WaitExit()
+		bitcoiinGo := runBitcoiinGo(t, append(args, []string{"--exec", "2+2", "console"}...)...)
+		bitcoiinGo.WaitExit()
 	}
 	// Retrieve the DAO config flag from the database
-	path := filepath.Join(datadir, "bitcoiin", "chaindata")
+	path := filepath.Join(datadir, "bitcoiinGo", "chaindata")
 	db, err := ethdb.NewLDBDatabase(path, 0, 0)
 	if err != nil {
 		t.Fatalf("test %d: failed to open test database: %v", test, err)

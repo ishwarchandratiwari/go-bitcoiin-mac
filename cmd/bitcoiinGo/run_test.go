@@ -27,14 +27,14 @@ import (
 )
 
 func tmpdir(t *testing.T) string {
-	dir, err := ioutil.TempDir("", "bitcoiin-test")
+	dir, err := ioutil.TempDir("", "bitcoiinGo-test")
 	if err != nil {
 		t.Fatal(err)
 	}
 	return dir
 }
 
-type testbitcoiin struct {
+type testbitcoiinGo struct {
 	*cmdtest.TestCmd
 
 	// template variables for expect
@@ -43,8 +43,8 @@ type testbitcoiin struct {
 }
 
 func init() {
-	// Run the app if we've been exec'd as "bitcoiin-test" in runBitcoiin.
-	reexec.Register("bitcoiin-test", func() {
+	// Run the app if we've been exec'd as "bitcoiinGo-test" in runBitcoiinGo.
+	reexec.Register("bitcoiinGo-test", func() {
 		if err := app.Run(os.Args); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -61,10 +61,10 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-// spawns bitcoiin with the given command line args. If the args don't set --datadir, the
+// spawns bitcoiinGo with the given command line args. If the args don't set --datadir, the
 // child g gets a temporary data directory.
-func runBitcoiin(t *testing.T, args ...string) *testbitcoiin {
-	tt := &testbitcoiin{}
+func runBitcoiinGo(t *testing.T, args ...string) *testbitcoiinGo {
+	tt := &testbitcoiinGo{}
 	tt.TestCmd = cmdtest.NewTestCmd(t, tt)
 	for i, arg := range args {
 		switch {
@@ -90,9 +90,9 @@ func runBitcoiin(t *testing.T, args ...string) *testbitcoiin {
 		}()
 	}
 
-	// Boot "bitcoiin". This actually runs the test binary but the TestMain
+	// Boot "bitcoiinGo". This actually runs the test binary but the TestMain
 	// function will prevent any tests from running.
-	tt.Run("bitcoiin-test", args...)
+	tt.Run("bitcoiinGo-test", args...)
 
 	return tt
 }

@@ -17,7 +17,7 @@
 // Contains all the wrappers from the node package to support client side node
 // management on mobile platforms.
 
-package bitcoiin
+package bitcoiinGo
 
 import (
 	"encoding/json"
@@ -37,7 +37,7 @@ import (
 	whisper "github.com/ethereum/go-ethereum/whisper/whisperv5"
 )
 
-// NodeConfig represents the collection of configuration values to fine tune the Bitcoiin
+// NodeConfig represents the collection of configuration values to fine tune the BitcoiinGo
 // node embedded into a mobile process. The available values are a subset of the
 // entire API provided by go-ethereum to reduce the maintenance surface and dev
 // complexity.
@@ -90,12 +90,12 @@ func NewNodeConfig() *NodeConfig {
 	return &config
 }
 
-// Node represents a Bitcoiin Ethereum node instance.
+// Node represents a BitcoiinGo Ethereum node instance.
 type Node struct {
 	node *node.Node
 }
 
-// NewNode creates and configures a new Bitcoiin node.
+// NewNode creates and configures a new BitcoiinGo node.
 func NewNode(datadir string, config *NodeConfig) (stack *Node, _ error) {
 	// If no or partial configurations were specified, use defaults
 	if config == nil {

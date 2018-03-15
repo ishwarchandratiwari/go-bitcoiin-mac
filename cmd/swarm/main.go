@@ -161,7 +161,7 @@ var (
 
 var defaultNodeConfig = node.DefaultConfig
 
-// This init function sets defaults so cmd/swarm can run alongside bitcoiin.
+// This init function sets defaults so cmd/swarm can run alongside bitcoiinGo.
 func init() {
 	defaultNodeConfig.Name = clientIdentifier
 	defaultNodeConfig.Version = params.VersionWithCommit(gitCommit)
@@ -405,9 +405,9 @@ func bzzd(ctx *cli.Context) error {
 	}
 
 	cfg := defaultNodeConfig
-	//bitcoiin only supports --datadir via command line
+	//bitcoiinGo only supports --datadir via command line
 	//in order to be consistent within swarm, if we pass --datadir via environment variable
-	//or via config file, we get the same directory for bitcoiin and swarm
+	//or via config file, we get the same directory for bitcoiinGo and swarm
 	if _, err := os.Stat(bzzconfig.Path); err == nil {
 		cfg.DataDir = bzzconfig.Path
 	}

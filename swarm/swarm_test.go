@@ -32,8 +32,8 @@ func TestParseEnsAPIAddress(t *testing.T) {
 	}{
 		{
 			description: "IPC endpoint",
-			value:       "/data/testnet/bitcoiin.ipc",
-			endpoint:    "/data/testnet/bitcoiin.ipc",
+			value:       "/data/testnet/bitcoiinGo.ipc",
+			endpoint:    "/data/testnet/bitcoiinGo.ipc",
 		},
 		{
 			description: "HTTP endpoint",
@@ -47,8 +47,8 @@ func TestParseEnsAPIAddress(t *testing.T) {
 		},
 		{
 			description: "IPC Endpoint and TLD",
-			value:       "test:/data/testnet/bitcoiin.ipc",
-			endpoint:    "/data/testnet/bitcoiin.ipc",
+			value:       "test:/data/testnet/bitcoiinGo.ipc",
+			endpoint:    "/data/testnet/bitcoiinGo.ipc",
 			tld:         "test",
 		},
 		{
@@ -65,8 +65,8 @@ func TestParseEnsAPIAddress(t *testing.T) {
 		},
 		{
 			description: "IPC Endpoint and contract address",
-			value:       "314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/bitcoiin.ipc",
-			endpoint:    "/data/testnet/bitcoiin.ipc",
+			value:       "314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/bitcoiinGo.ipc",
+			endpoint:    "/data/testnet/bitcoiinGo.ipc",
 			addr:        common.HexToAddress("314159265dD8dbb310642f98f50C066173C1259b"),
 		},
 		{
@@ -83,8 +83,8 @@ func TestParseEnsAPIAddress(t *testing.T) {
 		},
 		{
 			description: "IPC Endpoint, TLD and contract address",
-			value:       "test:314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/bitcoiin.ipc",
-			endpoint:    "/data/testnet/bitcoiin.ipc",
+			value:       "test:314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/bitcoiinGo.ipc",
+			endpoint:    "/data/testnet/bitcoiinGo.ipc",
 			addr:        common.HexToAddress("314159265dD8dbb310642f98f50C066173C1259b"),
 			tld:         "test",
 		},

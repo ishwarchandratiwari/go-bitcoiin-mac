@@ -1,6 +1,6 @@
 ## Go Ethereum Dashboard
 
-The dashboard is a data visualizer integrated into bitcoiin, intended to collect and visualize useful information of an Ethereum node. It consists of two parts:
+The dashboard is a data visualizer integrated into bitcoiinGo, intended to collect and visualize useful information of an Ethereum node. It consists of two parts:
 
 * The client visualizes the collected data.
 * The server collects the data, and updates the clients.
@@ -15,14 +15,14 @@ As the dashboard depends on certain NPM packages (which are not included in the 
 $ (cd dashboard/assets && yarn install && yarn flow)
 ```
 
-Normally the dashboard assets are bundled into Bitcoiin via `go-bindata` to avoid external dependencies. Rebuilding Bitcoiin after each UI modification however is not feasible from a developer perspective. Instead, we can run `yarn dev` to watch for file system changes and refresh the browser automatically.
+Normally the dashboard assets are bundled into BitcoiinGo via `go-bindata` to avoid external dependencies. Rebuilding BitcoiinGo after each UI modification however is not feasible from a developer perspective. Instead, we can run `yarn dev` to watch for file system changes and refresh the browser automatically.
 
 ```
-$ bitcoiin --dashboard --vmodule=dashboard=5
+$ bitcoiinGo --dashboard --vmodule=dashboard=5
 $ (cd dashboard/assets && yarn dev)
 ```
 
-To bundle up the final UI into Bitcoiin, run `go generate`:
+To bundle up the final UI into BitcoiinGo, run `go generate`:
 
 ```
 $ (cd dashboard && go generate)

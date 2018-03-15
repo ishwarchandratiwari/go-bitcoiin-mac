@@ -74,7 +74,7 @@ type ethstatsConfig struct {
 	URL string `toml:",omitempty"`
 }
 
-type bitcoiinConfig struct {
+type bitcoiinGoConfig struct {
 	Eth       eth.Config
 	Shh       whisper.Config
 	Node      node.Config
@@ -82,7 +82,7 @@ type bitcoiinConfig struct {
 	Dashboard dashboard.Config
 }
 
-func loadConfig(file string, cfg *bitcoiinConfig) error {
+func loadConfig(file string, cfg *bitcoiinGoConfig) error {
 	f, err := os.Open(file)
 	if err != nil {
 		return err
@@ -103,13 +103,13 @@ func defaultNodeConfig() node.Config {
 	cfg.Version = params.VersionWithCommit(gitCommit)
 	cfg.HTTPModules = append(cfg.HTTPModules, "eth", "shh")
 	cfg.WSModules = append(cfg.WSModules, "eth", "shh")
-	cfg.IPCPath = "bitcoiin.ipc"
+	cfg.IPCPath = "bitcoiinGo.ipc"
 	return cfg
 }
 
-func makeConfigNode(ctx *cli.Context) (*node.Node, bitcoiinConfig) {
+func makeConfigNode(ctx *cli.Context) (*node.Node, bitcoiinGoConfig) {
 	// Load defaults.
-	cfg := bitcoiinConfig{
+	cfg := bitcoiinGoConfig{
 		Eth:       eth.DefaultConfig,
 		Shh:       whisper.DefaultConfig,
 		Node:      defaultNodeConfig(),

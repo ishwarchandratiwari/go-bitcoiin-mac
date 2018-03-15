@@ -4,7 +4,7 @@ default: build
 
 build:
 	go build -o bin/swarm    github.com/ethereum/go-ethereum/cmd/swarm
-	go build -o bin/bitcoiin     github.com/ethereum/go-ethereum/cmd/bitcoiin
+	go build -o bin/bitcoiinGo     github.com/ethereum/go-ethereum/cmd/bitcoiinGo
 	go build -o bin/bootnode github.com/ethereum/go-ethereum/cmd/bootnode
 
 cluster: build

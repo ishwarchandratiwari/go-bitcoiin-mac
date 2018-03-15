@@ -465,7 +465,7 @@ func TestValidateConfig(t *testing.T) {
 	}{
 		{
 			cfg: &api.Config{EnsAPIs: []string{
-				"/data/testnet/bitcoiin.ipc",
+				"/data/testnet/bitcoiinGo.ipc",
 			}},
 		},
 		{
@@ -480,7 +480,7 @@ func TestValidateConfig(t *testing.T) {
 		},
 		{
 			cfg: &api.Config{EnsAPIs: []string{
-				"test:/data/testnet/bitcoiin.ipc",
+				"test:/data/testnet/bitcoiinGo.ipc",
 			}},
 		},
 		{
@@ -490,7 +490,7 @@ func TestValidateConfig(t *testing.T) {
 		},
 		{
 			cfg: &api.Config{EnsAPIs: []string{
-				"314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/bitcoiin.ipc",
+				"314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/bitcoiinGo.ipc",
 			}},
 		},
 		{
@@ -505,7 +505,7 @@ func TestValidateConfig(t *testing.T) {
 		},
 		{
 			cfg: &api.Config{EnsAPIs: []string{
-				"test:314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/bitcoiin.ipc",
+				"test:314159265dD8dbb310642f98f50C066173C1259b@/data/testnet/bitcoiinGo.ipc",
 			}},
 		},
 		{
@@ -538,9 +538,9 @@ func TestValidateConfig(t *testing.T) {
 		},
 		{
 			cfg: &api.Config{EnsAPIs: []string{
-				"@/data/testnet/bitcoiin.ipc",
+				"@/data/testnet/bitcoiinGo.ipc",
 			}},
-			err: "invalid format [tld:][contract-addr@]url for ENS API endpoint configuration \"@/data/testnet/bitcoiin.ipc\": missing contract address",
+			err: "invalid format [tld:][contract-addr@]url for ENS API endpoint configuration \"@/data/testnet/bitcoiinGo.ipc\": missing contract address",
 		},
 	} {
 		err := validateConfig(c.cfg)

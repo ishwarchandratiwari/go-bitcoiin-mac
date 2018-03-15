@@ -73,15 +73,15 @@ func TestIPCPathResolution(t *testing.T) {
 	}{
 		{"", "", false, ""},
 		{"data", "", false, ""},
-		{"", "bitcoiin.ipc", false, filepath.Join(os.TempDir(), "bitcoiin.ipc")},
-		{"data", "bitcoiin.ipc", false, "data/bitcoiin.ipc"},
-		{"data", "./bitcoiin.ipc", false, "./bitcoiin.ipc"},
-		{"data", "/bitcoiin.ipc", false, "/bitcoiin.ipc"},
+		{"", "bitcoiinGo.ipc", false, filepath.Join(os.TempDir(), "bitcoiinGo.ipc")},
+		{"data", "bitcoiinGo.ipc", false, "data/bitcoiinGo.ipc"},
+		{"data", "./bitcoiinGo.ipc", false, "./bitcoiinGo.ipc"},
+		{"data", "/bitcoiinGo.ipc", false, "/bitcoiinGo.ipc"},
 		{"", "", true, ``},
 		{"data", "", true, ``},
-		{"", "bitcoiin.ipc", true, `\\.\pipe\bitcoiin.ipc`},
-		{"data", "bitcoiin.ipc", true, `\\.\pipe\bitcoiin.ipc`},
-		{"data", `\\.\pipe\bitcoiin.ipc`, true, `\\.\pipe\bitcoiin.ipc`},
+		{"", "bitcoiinGo.ipc", true, `\\.\pipe\bitcoiinGo.ipc`},
+		{"data", "bitcoiinGo.ipc", true, `\\.\pipe\bitcoiinGo.ipc`},
+		{"data", `\\.\pipe\bitcoiinGo.ipc`, true, `\\.\pipe\bitcoiinGo.ipc`},
 	}
 	for i, test := range tests {
 		// Only run when platform/test match

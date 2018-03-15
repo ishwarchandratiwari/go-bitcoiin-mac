@@ -16,7 +16,7 @@
 
 // +build ios
 
-package bitcoiin
+package bitcoiinGo
 
 // clientIdentifier is a hard coded identifier to report into the network.
-var clientIdentifier = "iBitcoiin"
+var clientIdentifier = "iBitcoiinGo"

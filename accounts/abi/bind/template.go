@@ -427,8 +427,8 @@ const tmplSourceJava = `
 
 package {{.Package}};
 
-import org.ethereum.bitcoiin.*;
-import org.ethereum.bitcoiin.internal.*;
+import org.ethereum.bitcoiinGo.*;
+import org.ethereum.bitcoiinGo.internal.*;
 
 {{range $contract := .Contracts}}
 	public class {{.Type}} {
@@ -441,11 +441,11 @@ import org.ethereum.bitcoiin.internal.*;
 
 			// deploy deploys a new Ethereum contract, binding an instance of {{.Type}} to it.
 			public static {{.Type}} deploy(TransactOpts auth, EthereumClient client{{range .Constructor.Inputs}}, {{bindtype .Type}} {{.Name}}{{end}}) throws Exception {
-				Interfaces args = Bitcoiin.newInterfaces({{(len .Constructor.Inputs)}});
+				Interfaces args = BitcoiinGo.newInterfaces({{(len .Constructor.Inputs)}});
 				{{range $index, $element := .Constructor.Inputs}}
-				  args.set({{$index}}, Bitcoiin.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
+				  args.set({{$index}}, BitcoiinGo.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
 				{{end}}
-				return new {{.Type}}(Bitcoiin.deployContract(auth, ABI, BYTECODE, client, args));
+				return new {{.Type}}(BitcoiinGo.deployContract(auth, ABI, BYTECODE, client, args));
 			}
 
 			// Internal constructor used by contract deployment.
@@ -467,7 +467,7 @@ import org.ethereum.bitcoiin.internal.*;
 
 		// Creates a new instance of {{.Type}}, bound to a specific deployed contract.
 		public {{.Type}}(Address address, EthereumClient client) throws Exception {
-			this(Bitcoiin.bindContract(address, ABI, client));
+			this(BitcoiinGo.bindContract(address, ABI, client));
 		}
 
 		{{range .Calls}}
@@ -483,16 +483,16 @@ import org.ethereum.bitcoiin.internal.*;
 			//
 			// Solidity: {{.Original.String}}
 			public {{if gt (len .Normalized.Outputs) 1}}{{capitalise .Normalized.Name}}Results{{else}}{{range .Normalized.Outputs}}{{bindtype .Type}}{{end}}{{end}} {{.Normalized.Name}}(CallOpts opts{{range .Normalized.Inputs}}, {{bindtype .Type}} {{.Name}}{{end}}) throws Exception {
-				Interfaces args = Bitcoiin.newInterfaces({{(len .Normalized.Inputs)}});
-				{{range $index, $item := .Normalized.Inputs}}args.set({{$index}}, Bitcoiin.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
+				Interfaces args = BitcoiinGo.newInterfaces({{(len .Normalized.Inputs)}});
+				{{range $index, $item := .Normalized.Inputs}}args.set({{$index}}, BitcoiinGo.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
 				{{end}}
 
-				Interfaces results = Bitcoiin.newInterfaces({{(len .Normalized.Outputs)}});
-				{{range $index, $item := .Normalized.Outputs}}Interface result{{$index}} = Bitcoiin.newInterface(); result{{$index}}.setDefault{{namedtype (bindtype .Type) .Type}}(); results.set({{$index}}, result{{$index}});
+				Interfaces results = BitcoiinGo.newInterfaces({{(len .Normalized.Outputs)}});
+				{{range $index, $item := .Normalized.Outputs}}Interface result{{$index}} = BitcoiinGo.newInterface(); result{{$index}}.setDefault{{namedtype (bindtype .Type) .Type}}(); results.set({{$index}}, result{{$index}});
 				{{end}}
 
 				if (opts == null) {
-					opts = Bitcoiin.newCallOpts();
+					opts = BitcoiinGo.newCallOpts();
 				}
 				this.Contract.call(opts, results, "{{.Original.Name}}", args);
 				{{if gt (len .Normalized.Outputs) 1}}
@@ -510,8 +510,8 @@ import org.ethereum.bitcoiin.internal.*;
 			//
 			// Solidity: {{.Original.String}}
 			public Transaction {{.Normalized.Name}}(TransactOpts opts{{range .Normalized.Inputs}}, {{bindtype .Type}} {{.Name}}{{end}}) throws Exception {
-				Interfaces args = Bitcoiin.newInterfaces({{(len .Normalized.Inputs)}});
-				{{range $index, $item := .Normalized.Inputs}}args.set({{$index}}, Bitcoiin.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
+				Interfaces args = BitcoiinGo.newInterfaces({{(len .Normalized.Inputs)}});
+				{{range $index, $item := .Normalized.Inputs}}args.set({{$index}}, BitcoiinGo.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
 				{{end}}
 
 				return this.Contract.transact(opts, "{{.Original.Name}}"	, args);

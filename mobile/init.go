@@ -16,7 +16,7 @@
 
 // Contains initialization code for the mbile library.
 
-package bitcoiin
+package bitcoiinGo
 
 import (
 	"os"

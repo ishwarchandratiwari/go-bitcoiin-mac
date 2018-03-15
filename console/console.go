@@ -269,11 +269,11 @@ func (c *Console) AutoCompleteInput(line string, pos int) (string, []string, str
 	return line[:start], c.jsre.CompleteKeywords(line[start:pos]), line[pos:]
 }
 
-// Welcome show summary of current Bitcoiin instance and some metadata about the
+// Welcome show summary of current BitcoiinGo instance and some metadata about the
 // console's available modules.
 func (c *Console) Welcome() {
-	// Print some generic Bitcoiin metadata
-	fmt.Fprintf(c.printer, "Welcome to the Bitcoiin JavaScript console!\n\n")
+	// Print some generic BitcoiinGo metadata
+	fmt.Fprintf(c.printer, "Welcome to the BitcoiinGo JavaScript console!\n\n")
 	c.jsre.Run(`
 		console.log("instance: " + web3.version.node);
 		console.log("coinbase: " + eth.coinbase);

@@ -40,25 +40,25 @@ const (
 func TestConsoleWelcome(t *testing.T) {
 	coinbase := "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182"
 
-	// Start a bitcoiin console, make sure it's cleaned up and terminate the console
-	bitcoiin := runBitcoiin(t,
+	// Start a bitcoiinGo console, make sure it's cleaned up and terminate the console
+	bitcoiinGo := runBitcoiinGo(t,
 		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
 		"--etherbase", coinbase, "--shh",
 		"console")
 
 	// Gather all the infos the welcome message needs to contain
-	bitcoiin.SetTemplateFunc("goos", func() string { return runtime.GOOS })
-	bitcoiin.SetTemplateFunc("goarch", func() string { return runtime.GOARCH })
-	bitcoiin.SetTemplateFunc("gover", runtime.Version)
-	bitcoiin.SetTemplateFunc("bitcoiinver", func() string { return params.Version })
-	bitcoiin.SetTemplateFunc("niltime", func() string { return time.Unix(0, 0).Format(time.RFC1123) })
-	bitcoiin.SetTemplateFunc("apis", func() string { return ipcAPIs })
+	bitcoiinGo.SetTemplateFunc("goos", func() string { return runtime.GOOS })
+	bitcoiinGo.SetTemplateFunc("goarch", func() string { return runtime.GOARCH })
+	bitcoiinGo.SetTemplateFunc("gover", runtime.Version)
+	bitcoiinGo.SetTemplateFunc("bitcoiinGover", func() string { return params.Version })
+	bitcoiinGo.SetTemplateFunc("niltime", func() string { return time.Unix(0, 0).Format(time.RFC1123) })
+	bitcoiinGo.SetTemplateFunc("apis", func() string { return ipcAPIs })
 
 	// Verify the actual welcome message to the required template
-	bitcoiin.Expect(`
-Welcome to the Bitcoiin JavaScript console!
+	bitcoiinGo.Expect(`
+Welcome to the BitcoiinGo JavaScript console!
 
-instance: Bitcoiin/v{{bitcoiinver}}/{{goos}}-{{goarch}}/{{gover}}
+instance: BitcoiinGo/v{{bitcoiinGover}}/{{goos}}-{{goarch}}/{{gover}}
 coinbase: {{.Etherbase}}
 at block: 0 ({{niltime}})
  datadir: {{.Datadir}}
@@ -66,7 +66,7 @@ at block: 0 ({{niltime}})
 
 > {{.InputLine "exit"}}
 `)
-	bitcoiin.ExpectExit()
+	bitcoiinGo.ExpectExit()
 }
 
 // Tests that a console can be attached to a running node via various means.
@@ -75,57 +75,57 @@ func TestIPCAttachWelcome(t *testing.T) {
 	coinbase := "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182"
 	var ipc string
 	if runtime.GOOS == "windows" {
-		ipc = `\\.\pipe\bitcoiin` + strconv.Itoa(trulyRandInt(100000, 999999))
+		ipc = `\\.\pipe\bitcoiinGo` + strconv.Itoa(trulyRandInt(100000, 999999))
 	} else {
 		ws := tmpdir(t)
 		defer os.RemoveAll(ws)
-		ipc = filepath.Join(ws, "bitcoiin.ipc")
+		ipc = filepath.Join(ws, "bitcoiinGo.ipc")
 	}
 	// Note: we need --shh because testAttachWelcome checks for default
 	// list of ipc modules and shh is included there.
-	bitcoiin := runBitcoiin(t,
+	bitcoiinGo := runBitcoiinGo(t,
 		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
 		"--etherbase", coinbase, "--shh", "--ipcpath", ipc)
 
 	time.Sleep(2 * time.Second) // Simple way to wait for the RPC endpoint to open
-	testAttachWelcome(t, bitcoiin, "ipc:"+ipc, ipcAPIs)
+	testAttachWelcome(t, bitcoiinGo, "ipc:"+ipc, ipcAPIs)
 
-	bitcoiin.Interrupt()
-	bitcoiin.ExpectExit()
+	bitcoiinGo.Interrupt()
+	bitcoiinGo.ExpectExit()
 }
 
 func TestHTTPAttachWelcome(t *testing.T) {
 	coinbase := "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182"
 	port := strconv.Itoa(trulyRandInt(1024, 65536)) // Yeah, sometimes this will fail, sorry :P
-	bitcoiin := runBitcoiin(t,
+	bitcoiinGo := runBitcoiinGo(t,
 		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
 		"--etherbase", coinbase, "--rpc", "--rpcport", port)
 
 	time.Sleep(2 * time.Second) // Simple way to wait for the RPC endpoint to open
-	testAttachWelcome(t, bitcoiin, "http://localhost:"+port, httpAPIs)
+	testAttachWelcome(t, bitcoiinGo, "http://localhost:"+port, httpAPIs)
 
-	bitcoiin.Interrupt()
-	bitcoiin.ExpectExit()
+	bitcoiinGo.Interrupt()
+	bitcoiinGo.ExpectExit()
 }
 
 func TestWSAttachWelcome(t *testing.T) {
 	coinbase := "0x8605cdbbdb6d264aa742e77020dcbc58fcdce182"
 	port := strconv.Itoa(trulyRandInt(1024, 65536)) // Yeah, sometimes this will fail, sorry :P
 
-	bitcoiin := runBitcoiin(t,
+	bitcoiinGo := runBitcoiinGo(t,
 		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
 		"--etherbase", coinbase, "--ws", "--wsport", port)
 
 	time.Sleep(2 * time.Second) // Simple way to wait for the RPC endpoint to open
-	testAttachWelcome(t, bitcoiin, "ws://localhost:"+port, httpAPIs)
+	testAttachWelcome(t, bitcoiinGo, "ws://localhost:"+port, httpAPIs)
 
-	bitcoiin.Interrupt()
-	bitcoiin.ExpectExit()
+	bitcoiinGo.Interrupt()
+	bitcoiinGo.ExpectExit()
 }
 
-func testAttachWelcome(t *testing.T, bitcoiin *testbitcoiin, endpoint, apis string) {
-	// Attach to a running bitcoiin note and terminate immediately
-	attach := runBitcoiin(t, "attach", endpoint)
+func testAttachWelcome(t *testing.T, bitcoiinGo *testbitcoiinGo, endpoint, apis string) {
+	// Attach to a running bitcoiinGo note and terminate immediately
+	attach := runBitcoiinGo(t, "attach", endpoint)
 	defer attach.ExpectExit()
 	attach.CloseStdin()
 
@@ -134,17 +134,17 @@ func testAttachWelcome(t *testing.T, bitcoiin *testbitcoiin, endpoint, apis stri
 	attach.SetTemplateFunc("goarch", func() string { return runtime.GOARCH })
 	attach.SetTemplateFunc("gover", runtime.Version)
 	attach.SetTemplateFunc("gethver", func() string { return params.Version })
-	attach.SetTemplateFunc("etherbase", func() string { return bitcoiin.Etherbase })
+	attach.SetTemplateFunc("etherbase", func() string { return bitcoiinGo.Etherbase })
 	attach.SetTemplateFunc("niltime", func() string { return time.Unix(0, 0).Format(time.RFC1123) })
 	attach.SetTemplateFunc("ipc", func() bool { return strings.HasPrefix(endpoint, "ipc") })
-	attach.SetTemplateFunc("datadir", func() string { return bitcoiin.Datadir })
+	attach.SetTemplateFunc("datadir", func() string { return bitcoiinGo.Datadir })
 	attach.SetTemplateFunc("apis", func() string { return apis })
 
 	// Verify the actual welcome message to the required template
 	attach.Expect(`
-Welcome to the Bitcoiin JavaScript console!
+Welcome to the BitcoiinGo JavaScript console!
 
-instance: Bitcoiin/v{{bitcoiinver}}/{{goos}}-{{goarch}}/{{gover}}
+instance: BitcoiinGo/v{{bitcoiinGover}}/{{goos}}-{{goarch}}/{{gover}}
 coinbase: {{etherbase}}
 at block: 0 ({{niltime}}){{if ipc}}
  datadir: {{datadir}}{{end}}
