@@ -37,7 +37,6 @@ type CodecOption int
 const (
 	// OptionMethodInvocation is an indication that the codec supports RPC method calls
 	OptionMethodInvocation CodecOption = 1 << iota
-
 	// OptionSubscriptions is an indication that the codec suports RPC notifications
 	OptionSubscriptions = 1 << iota // support pub sub
 )
