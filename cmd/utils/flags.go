@@ -462,7 +462,7 @@ var (
 	BootnodesFlag = cli.StringFlag{
 		Name:  "bootnodes",
 		Usage: "Comma separated enode URLs for P2P discovery bootstrap (set v4+v5 instead for light servers)",
-		Value: "",
+		Value: "enode://de13a7e18af98a4a2b089139bd4eaee8dbf589dd2724d081459fd56218daa5c554892200753ba203062ad3b3b9ffd7bd0b6a8a9533414427878b1e1795e1a21c@13.126.229.165:30303",
 	}
 	BootnodesV4Flag = cli.StringFlag{
 		Name:  "bootnodesv4",
