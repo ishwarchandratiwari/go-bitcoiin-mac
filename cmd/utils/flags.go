@@ -113,11 +113,11 @@ func NewApp(gitCommit, usage string) *cli.App {
 
 var (
 	// General settings
-	// DataDirFlag = DirectoryFlag{
-	// 	Name:  "datadir",
-	// 	Usage: "Data directory for the databases and keystore",
-	// 	Value: DirectoryString{node.DefaultDataDir()},
-	// }
+	DataDirFlag = DirectoryFlag{
+		Name:  "datadir",
+		Usage: "Data directory for the databases and keystore",
+		Value: DirectoryString{node.DefaultDataDir()},
+	}
 	KeyStoreDirFlag = DirectoryFlag{
 		Name:  "keystore",
 		Usage: "Directory for the keystore (default = inside the datadir)",
@@ -538,7 +538,7 @@ var (
 // if none (or the empty string) is specified. If the node is starting a testnet,
 // the a subdirectory of the specified datadir will be used.
 func MakeDataDir(ctx *cli.Context) string {
-	if path := ctx.GlobalString(""); path != "" {
+	if path := ctx.GlobalString(DataDirFlag.Name); path != "" {
 		// if ctx.GlobalBool(TestnetFlag.Name) {
 		// 	return filepath.Join(path, "testnet")
 		// }
@@ -878,8 +878,8 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 	setNodeUserIdent(ctx, cfg)
 
 	switch {
-	// case ctx.GlobalIsSet(DataDirFlag.Name):
-	// 	cfg.DataDir = ctx.GlobalString(DataDirFlag.Name)
+	case ctx.GlobalIsSet(DataDirFlag.Name):
+		cfg.DataDir = ctx.GlobalString(DataDirFlag.Name)
 	case ctx.GlobalBool(DeveloperFlag.Name):
 		cfg.DataDir = "" // unless explicitly requested, use memory databases
 		// case ctx.GlobalBool(TestnetFlag.Name):

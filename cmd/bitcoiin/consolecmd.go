@@ -118,9 +118,9 @@ func remoteConsole(ctx *cli.Context) error {
 	endpoint := ctx.Args().First()
 	if endpoint == "" {
 		path := node.DefaultDataDir()
-		// if ctx.GlobalIsSet(utils.DataDirFlag.Name) {
-		// 	path = ctx.GlobalString(utils.DataDirFlag.Name)
-		// }
+		if ctx.GlobalIsSet(utils.DataDirFlag.Name) {
+			path = ctx.GlobalString(utils.DataDirFlag.Name)
+		}
 		if path != "" {
 			// if ctx.GlobalBool(utils.TestnetFlag.Name) {
 			// 	path = filepath.Join(path, "testnet")
