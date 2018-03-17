@@ -1,20 +1,20 @@
-// Copyright 2014 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// Copyright 2014 The go-bitcoiin2g Authors
+// This file is part of the go-bitcoiin2g library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-bitcoiin2g library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package eth implements the Ethereum protocol.
+// Package eth implements the Bitcoiin2g protocol.
 package eth
 
 import (
@@ -57,13 +57,13 @@ type LesServer interface {
 	SetBloomBitsIndexer(bbIndexer *core.ChainIndexer)
 }
 
-// Ethereum implements the Ethereum full node service.
-type Ethereum struct {
+// Bitcoiin2g implements the Bitcoiin2g full node service.
+type Bitcoiin2g struct {
 	config      *Config
 	chainConfig *params.ChainConfig
 
 	// Channel for shutting down the service
-	shutdownChan  chan bool    // Channel for shutting down the ethereum
+	shutdownChan  chan bool    // Channel for shutting down the bitcoiin2g
 	stopDbUpgrade func() error // stop chain db sequential key upgrade
 
 	// Handlers
@@ -86,24 +86,24 @@ type Ethereum struct {
 
 	miner     *miner.Miner
 	gasPrice  *big.Int
-	etherbase common.Address
+	bitcoiinbase common.Address
 
 	networkId     uint64
 	netRPCService *ethapi.PublicNetAPI
 
-	lock sync.RWMutex // Protects the variadic fields (e.g. gas price and etherbase)
+	lock sync.RWMutex // Protects the variadic fields (e.g. gas price and bitcoiinbase)
 }
 
-func (s *Ethereum) AddLesServer(ls LesServer) {
+func (s *Bitcoiin2g) AddLesServer(ls LesServer) {
 	s.lesServer = ls
 	ls.SetBloomBitsIndexer(s.bloomIndexer)
 }
 
-// New creates a new Ethereum object (including the
-// initialisation of the common Ethereum object)
-func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
+// New creates a new Bitcoiin2g object (including the
+// initialisation of the common Bitcoiin2g object)
+func New(ctx *node.ServiceContext, config *Config) (*Bitcoiin2g, error) {
 	if config.SyncMode == downloader.LightSync {
-		return nil, errors.New("can't run eth.Ethereum in light sync mode, use les.LightEthereum")
+		return nil, errors.New("can't run eth.Bitcoiin2g in light sync mode, use les.LightBitcoiin2g")
 	}
 	if !config.SyncMode.IsValid() {
 		return nil, fmt.Errorf("invalid sync mode %d", config.SyncMode)
@@ -119,7 +119,7 @@ func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 	}
 	log.Info("Initialised chain configuration", "config", chainConfig)
 
-	eth := &Ethereum{
+	eth := &Bitcoiin2g{
 		config:         config,
 		chainDb:        chainDb,
 		chainConfig:    chainConfig,
@@ -130,12 +130,12 @@ func New(ctx *node.ServiceContext, config *Config) (*Ethereum, error) {
 		stopDbUpgrade:  stopDbUpgrade,
 		networkId:      config.NetworkId,
 		gasPrice:       config.GasPrice,
-		etherbase:      config.Etherbase,
+		bitcoiinbase:      config.Bitcoiinbase,
 		bloomRequests:  make(chan chan *bloombits.Retrieval),
 		bloomIndexer:   NewBloomIndexer(chainDb, params.BloomBitsBlocks),
 	}
 
-	log.Info("Initialising Ethereum protocol", "versions", ProtocolVersions, "network", config.NetworkId)
+	log.Info("Initialising Bitcoiin2g protocol", "versions", ProtocolVersions, "network", config.NetworkId)
 
 	if !config.SkipBcVersionCheck {
 		bcVersion := core.GetBlockChainVersion(chainDb)
@@ -210,7 +210,7 @@ func CreateDB(ctx *node.ServiceContext, config *Config, name string) (ethdb.Data
 	return db, nil
 }
 
-// CreateConsensusEngine creates the required type of consensus engine instance for an Ethereum service
+// CreateConsensusEngine creates the required type of consensus engine instance for an Bitcoiin2g service
 func CreateConsensusEngine(ctx *node.ServiceContext, config *ethash.Config, chainConfig *params.ChainConfig, db ethdb.Database) consensus.Engine {
 	// If proof-of-authority is requested, set it up
 	if chainConfig.Clique != nil {
@@ -241,9 +241,9 @@ func CreateConsensusEngine(ctx *node.ServiceContext, config *ethash.Config, chai
 	}
 }
 
-// APIs returns the collection of RPC services the ethereum package offers.
+// APIs returns the collection of RPC services the bitcoiin2g package offers.
 // NOTE, some of these services probably need to be moved to somewhere else.
-func (s *Ethereum) APIs() []rpc.API {
+func (s *Bitcoiin2g) APIs() []rpc.API {
 	apis := ethapi.GetAPIs(s.ApiBackend)
 
 	// Append any APIs exposed explicitly by the consensus engine
@@ -254,7 +254,7 @@ func (s *Ethereum) APIs() []rpc.API {
 		{
 			Namespace: "eth",
 			Version:   "1.0",
-			Service:   NewPublicEthereumAPI(s),
+			Service:   NewPublicBitcoiin2gAPI(s),
 			Public:    true,
 		}, {
 			Namespace: "eth",
@@ -298,52 +298,52 @@ func (s *Ethereum) APIs() []rpc.API {
 	}...)
 }
 
-func (s *Ethereum) ResetWithGenesisBlock(gb *types.Block) {
+func (s *Bitcoiin2g) ResetWithGenesisBlock(gb *types.Block) {
 	s.blockchain.ResetWithGenesisBlock(gb)
 }
 
-func (s *Ethereum) Etherbase() (eb common.Address, err error) {
+func (s *Bitcoiin2g) Bitcoiinbase() (eb common.Address, err error) {
 	s.lock.RLock()
-	etherbase := s.etherbase
+	bitcoiinbase := s.bitcoiinbase
 	s.lock.RUnlock()
 
-	if etherbase != (common.Address{}) {
-		return etherbase, nil
+	if bitcoiinbase != (common.Address{}) {
+		return bitcoiinbase, nil
 	}
 	if wallets := s.AccountManager().Wallets(); len(wallets) > 0 {
 		if accounts := wallets[0].Accounts(); len(accounts) > 0 {
-			etherbase := accounts[0].Address
+			bitcoiinbase := accounts[0].Address
 
 			s.lock.Lock()
-			s.etherbase = etherbase
+			s.bitcoiinbase = bitcoiinbase
 			s.lock.Unlock()
 
-			log.Info("Etherbase automatically configured", "address", etherbase)
-			return etherbase, nil
+			log.Info("Bitcoiinbase automatically configured", "address", bitcoiinbase)
+			return bitcoiinbase, nil
 		}
 	}
-	return common.Address{}, fmt.Errorf("etherbase must be explicitly specified")
+	return common.Address{}, fmt.Errorf("bitcoiinbase must be explicitly specified")
 }
 
 // set in js console via admin interface or wrapper from cli flags
-func (self *Ethereum) SetEtherbase(etherbase common.Address) {
+func (self *Bitcoiin2g) SetBitcoiinbase(bitcoiinbase common.Address) {
 	self.lock.Lock()
-	self.etherbase = etherbase
+	self.bitcoiinbase = bitcoiinbase
 	self.lock.Unlock()
 
-	self.miner.SetEtherbase(etherbase)
+	self.miner.SetBitcoiinbase(bitcoiinbase)
 }
 
-func (s *Ethereum) StartMining(local bool) error {
-	eb, err := s.Etherbase()
+func (s *Bitcoiin2g) StartMining(local bool) error {
+	eb, err := s.Bitcoiinbase()
 	if err != nil {
-		log.Error("Cannot start mining without etherbase", "err", err)
-		return fmt.Errorf("etherbase missing: %v", err)
+		log.Error("Cannot start mining without bitcoiinbase", "err", err)
+		return fmt.Errorf("bitcoiinbase missing: %v", err)
 	}
 	if clique, ok := s.engine.(*clique.Clique); ok {
 		wallet, err := s.accountManager.Find(accounts.Account{Address: eb})
 		if wallet == nil || err != nil {
-			log.Error("Etherbase account unavailable locally", "err", err)
+			log.Error("Bitcoiinbase account unavailable locally", "err", err)
 			return fmt.Errorf("signer missing: %v", err)
 		}
 		clique.Authorize(eb, wallet.SignHash)
@@ -359,24 +359,24 @@ func (s *Ethereum) StartMining(local bool) error {
 	return nil
 }
 
-func (s *Ethereum) StopMining()         { s.miner.Stop() }
-func (s *Ethereum) IsMining() bool      { return s.miner.Mining() }
-func (s *Ethereum) Miner() *miner.Miner { return s.miner }
+func (s *Bitcoiin2g) StopMining()         { s.miner.Stop() }
+func (s *Bitcoiin2g) IsMining() bool      { return s.miner.Mining() }
+func (s *Bitcoiin2g) Miner() *miner.Miner { return s.miner }
 
-func (s *Ethereum) AccountManager() *accounts.Manager  { return s.accountManager }
-func (s *Ethereum) BlockChain() *core.BlockChain       { return s.blockchain }
-func (s *Ethereum) TxPool() *core.TxPool               { return s.txPool }
-func (s *Ethereum) EventMux() *event.TypeMux           { return s.eventMux }
-func (s *Ethereum) Engine() consensus.Engine           { return s.engine }
-func (s *Ethereum) ChainDb() ethdb.Database            { return s.chainDb }
-func (s *Ethereum) IsListening() bool                  { return true } // Always listening
-func (s *Ethereum) EthVersion() int                    { return int(s.protocolManager.SubProtocols[0].Version) }
-func (s *Ethereum) NetVersion() uint64                 { return s.networkId }
-func (s *Ethereum) Downloader() *downloader.Downloader { return s.protocolManager.downloader }
+func (s *Bitcoiin2g) AccountManager() *accounts.Manager  { return s.accountManager }
+func (s *Bitcoiin2g) BlockChain() *core.BlockChain       { return s.blockchain }
+func (s *Bitcoiin2g) TxPool() *core.TxPool               { return s.txPool }
+func (s *Bitcoiin2g) EventMux() *event.TypeMux           { return s.eventMux }
+func (s *Bitcoiin2g) Engine() consensus.Engine           { return s.engine }
+func (s *Bitcoiin2g) ChainDb() ethdb.Database            { return s.chainDb }
+func (s *Bitcoiin2g) IsListening() bool                  { return true } // Always listening
+func (s *Bitcoiin2g) EthVersion() int                    { return int(s.protocolManager.SubProtocols[0].Version) }
+func (s *Bitcoiin2g) NetVersion() uint64                 { return s.networkId }
+func (s *Bitcoiin2g) Downloader() *downloader.Downloader { return s.protocolManager.downloader }
 
 // Protocols implements node.Service, returning all the currently configured
 // network protocols to start.
-func (s *Ethereum) Protocols() []p2p.Protocol {
+func (s *Bitcoiin2g) Protocols() []p2p.Protocol {
 	if s.lesServer == nil {
 		return s.protocolManager.SubProtocols
 	}
@@ -384,8 +384,8 @@ func (s *Ethereum) Protocols() []p2p.Protocol {
 }
 
 // Start implements node.Service, starting all internal goroutines needed by the
-// Ethereum protocol implementation.
-func (s *Ethereum) Start(srvr *p2p.Server) error {
+// Bitcoiin2g protocol implementation.
+func (s *Bitcoiin2g) Start(srvr *p2p.Server) error {
 	// Start the bloom bits servicing goroutines
 	s.startBloomHandlers()
 
@@ -409,8 +409,8 @@ func (s *Ethereum) Start(srvr *p2p.Server) error {
 }
 
 // Stop implements node.Service, terminating all internal goroutines used by the
-// Ethereum protocol.
-func (s *Ethereum) Stop() error {
+// Bitcoiin2g protocol.
+func (s *Bitcoiin2g) Stop() error {
 	if s.stopDbUpgrade != nil {
 		s.stopDbUpgrade()
 	}

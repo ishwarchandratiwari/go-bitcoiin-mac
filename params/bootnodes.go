@@ -1,25 +1,25 @@
-// Copyright 2015 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// Copyright 2015 The go-bitcoiin2g Authors
+// This file is part of the go-bitcoiin2g library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-bitcoiin2g library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
 
 package params
 
 // MainnetBootnodes are the enode URLs of the P2P bootstrap nodes running on
-// the main Ethereum network.
+// the main Bitcoiin2g network.
 var MainnetBootnodes = []string{
-	// Ethereum Foundation Go Bootnodes
+	// Bitcoiin2g Foundation Go Bootnodes
 	"enode://5eefd07b2935f4e743950c2861ea1e46005635993e770cad1a40cd39254beb18acfe3d87887aa216701622710ada55d48c50920db91c5c6c93ba56ea75cea2b0@13.126.229.165:30303", // IE
 
 }

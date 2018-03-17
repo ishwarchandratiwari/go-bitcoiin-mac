@@ -1,24 +1,24 @@
-// Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// Copyright 2016 The go-bitcoiin2g Authors
+// This file is part of the go-bitcoiin2g library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-bitcoiin2g library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
 
-// Package chequebook package wraps the 'chequebook' Ethereum smart contract.
+// Package chequebook package wraps the 'chequebook' bitcoiin2g smart contract.
 //
 // The functions in this package allow using chequebook for
-// issuing, receiving, verifying cheques in ether; (auto)cashing cheques in ether
-// as well as (auto)depositing ether to the chequebook contract.
+// issuing, receiving, verifying cheques in bitcoiin; (auto)cashing cheques in bitcoiin
+// as well as (auto)depositing bitcoiin to the chequebook contract.
 package chequebook
 
 //go:generate abigen --sol contract/chequebook.sol --exc contract/mortal.sol:mortal,contract/owned.sol:owned --pkg contract --out contract/chequebook.go
@@ -52,8 +52,8 @@ import (
 // Some functionality requires interacting with the blockchain:
 // * setting current balance on peer's chequebook
 // * sending the transaction to cash the cheque
-// * depositing ether to the chequebook
-// * watching incoming ether
+// * depositing bitcoiin to the chequebook
+// * watching incoming bitcoiin
 
 var (
 	gasToCash = uint64(2000000) // gas cost of a cash transaction using chequebook
@@ -620,7 +620,7 @@ func sig2vrs(sig []byte) (v byte, r, s [32]byte) {
 	return
 }
 
-// Cash cashes the cheque by sending an Ethereum transaction.
+// Cash cashes the cheque by sending an bitcoiin2g transaction.
 func (self *Cheque) Cash(session *contract.ChequebookSession) (string, error) {
 	v, r, s := sig2vrs(self.Sig)
 	tx, err := session.Cash(self.Beneficiary, self.Amount, v, r, s)

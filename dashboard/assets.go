@@ -55,8 +55,8 @@ var _indexHtml = []byte(`<!DOCTYPE html>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Go Ethereum Dashboard</title>
-        <link rel="shortcut icon" type="image/ico" href="https://ethereum.org/favicon.ico" />
+        <title>Go Bitcoiin2g Dashboard</title>
+        <link rel="shortcut icon" type="image/ico" href="https://bitcoiin2g.org/favicon.ico" />
         <style>
             ::-webkit-scrollbar {
                 width: 16px;
@@ -28661,7 +28661,7 @@ var _bundleJs = []byte((((((((((`!function(modules) {
                     color: "inherit",
                     noWrap: !0,
                     className: classes.title
-                }, "Go Ethereum Dashboard")));
+                }, "Go Bitcoiin2g Dashboard")));
             }
         } ]), Header;
     }(_react.Component);

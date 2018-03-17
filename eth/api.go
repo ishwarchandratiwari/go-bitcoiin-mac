@@ -1,18 +1,18 @@
-// Copyright 2015 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// Copyright 2015 The go-bitcoiin2g Authors
+// This file is part of the go-bitcoiin2g library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-bitcoiin2g library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
 
 package eth
 
@@ -38,41 +38,41 @@ import (
 	"github.com/bitcoiinBT2/go-bitcoiin/trie"
 )
 
-// PublicEthereumAPI provides an API to access Ethereum full node-related
+// PublicBitcoiin2gAPI provides an API to access Bitcoiin2g full node-related
 // information.
-type PublicEthereumAPI struct {
-	e *Ethereum
+type PublicBitcoiin2gAPI struct {
+	e *Bitcoiin2g
 }
 
-// NewPublicEthereumAPI creates a new Ethereum protocol API for full nodes.
-func NewPublicEthereumAPI(e *Ethereum) *PublicEthereumAPI {
-	return &PublicEthereumAPI{e}
+// NewPublicBitcoiin2gAPI creates a new Bitcoiin2g protocol API for full nodes.
+func NewPublicBitcoiin2gAPI(e *Bitcoiin2g) *PublicBitcoiin2gAPI {
+	return &PublicBitcoiin2gAPI{e}
 }
 
-// Etherbase is the address that mining rewards will be send to
-func (api *PublicEthereumAPI) Etherbase() (common.Address, error) {
-	return api.e.Etherbase()
+// Bitcoiinbase is the address that mining rewards will be send to
+func (api *PublicBitcoiin2gAPI) Bitcoiinbase() (common.Address, error) {
+	return api.e.Bitcoiinbase()
 }
 
-// Coinbase is the address that mining rewards will be send to (alias for Etherbase)
-func (api *PublicEthereumAPI) Coinbase() (common.Address, error) {
-	return api.Etherbase()
+// Coinbase is the address that mining rewards will be send to (alias for Bitcoiinbase)
+func (api *PublicBitcoiin2gAPI) Coinbase() (common.Address, error) {
+	return api.Bitcoiinbase()
 }
 
 // Hashrate returns the POW hashrate
-func (api *PublicEthereumAPI) Hashrate() hexutil.Uint64 {
+func (api *PublicBitcoiin2gAPI) Hashrate() hexutil.Uint64 {
 	return hexutil.Uint64(api.e.Miner().HashRate())
 }
 
 // PublicMinerAPI provides an API to control the miner.
 // It offers only methods that operate on data that pose no security risk when it is publicly accessible.
 type PublicMinerAPI struct {
-	e     *Ethereum
+	e     *Bitcoiin2g
 	agent *miner.RemoteAgent
 }
 
 // NewPublicMinerAPI create a new PublicMinerAPI instance.
-func NewPublicMinerAPI(e *Ethereum) *PublicMinerAPI {
+func NewPublicMinerAPI(e *Bitcoiin2g) *PublicMinerAPI {
 	agent := miner.NewRemoteAgent(e.BlockChain(), e.Engine())
 	e.Miner().Register(agent)
 
@@ -118,11 +118,11 @@ func (api *PublicMinerAPI) SubmitHashrate(hashrate hexutil.Uint64, id common.Has
 // PrivateMinerAPI provides private RPC methods to control the miner.
 // These methods can be abused by external users and must be considered insecure for use by untrusted users.
 type PrivateMinerAPI struct {
-	e *Ethereum
+	e *Bitcoiin2g
 }
 
 // NewPrivateMinerAPI create a new RPC service which controls the miner of this node.
-func NewPrivateMinerAPI(e *Ethereum) *PrivateMinerAPI {
+func NewPrivateMinerAPI(e *Bitcoiin2g) *PrivateMinerAPI {
 	return &PrivateMinerAPI{e: e}
 }
 
@@ -187,9 +187,9 @@ func (api *PrivateMinerAPI) SetGasPrice(gasPrice hexutil.Big) bool {
 	return true
 }
 
-// SetEtherbase sets the etherbase of the miner
-func (api *PrivateMinerAPI) SetEtherbase(etherbase common.Address) bool {
-	api.e.SetEtherbase(etherbase)
+// SetBitcoiinbase sets the bitcoiinbase of the miner
+func (api *PrivateMinerAPI) SetBitcoiinbase(bitcoiinbase common.Address) bool {
+	api.e.SetBitcoiinbase(bitcoiinbase)
 	return true
 }
 
@@ -198,15 +198,15 @@ func (api *PrivateMinerAPI) GetHashrate() uint64 {
 	return uint64(api.e.miner.HashRate())
 }
 
-// PrivateAdminAPI is the collection of Ethereum full node-related APIs
+// PrivateAdminAPI is the collection of Bitcoiin2g full node-related APIs
 // exposed over the private admin endpoint.
 type PrivateAdminAPI struct {
-	eth *Ethereum
+	eth *Bitcoiin2g
 }
 
 // NewPrivateAdminAPI creates a new API definition for the full node private
-// admin methods of the Ethereum service.
-func NewPrivateAdminAPI(eth *Ethereum) *PrivateAdminAPI {
+// admin methods of the Bitcoiin2g service.
+func NewPrivateAdminAPI(eth *Bitcoiin2g) *PrivateAdminAPI {
 	return &PrivateAdminAPI{eth: eth}
 }
 
@@ -291,15 +291,15 @@ func (api *PrivateAdminAPI) ImportChain(file string) (bool, error) {
 	return true, nil
 }
 
-// PublicDebugAPI is the collection of Ethereum full node APIs exposed
+// PublicDebugAPI is the collection of Bitcoiin2g full node APIs exposed
 // over the public debugging endpoint.
 type PublicDebugAPI struct {
-	eth *Ethereum
+	eth *Bitcoiin2g
 }
 
 // NewPublicDebugAPI creates a new API definition for the full node-
-// related public debug methods of the Ethereum service.
-func NewPublicDebugAPI(eth *Ethereum) *PublicDebugAPI {
+// related public debug methods of the Bitcoiin2g service.
+func NewPublicDebugAPI(eth *Bitcoiin2g) *PublicDebugAPI {
 	return &PublicDebugAPI{eth: eth}
 }
 
@@ -328,16 +328,16 @@ func (api *PublicDebugAPI) DumpBlock(blockNr rpc.BlockNumber) (state.Dump, error
 	return stateDb.RawDump(), nil
 }
 
-// PrivateDebugAPI is the collection of Ethereum full node APIs exposed over
+// PrivateDebugAPI is the collection of Bitcoiin2g full node APIs exposed over
 // the private debugging endpoint.
 type PrivateDebugAPI struct {
 	config *params.ChainConfig
-	eth    *Ethereum
+	eth    *Bitcoiin2g
 }
 
 // NewPrivateDebugAPI creates a new API definition for the full node-related
-// private debug methods of the Ethereum service.
-func NewPrivateDebugAPI(config *params.ChainConfig, eth *Ethereum) *PrivateDebugAPI {
+// private debug methods of the Bitcoiin2g service.
+func NewPrivateDebugAPI(config *params.ChainConfig, eth *Bitcoiin2g) *PrivateDebugAPI {
 	return &PrivateDebugAPI{config: config, eth: eth}
 }
 

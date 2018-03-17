@@ -1,18 +1,18 @@
-// Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// Copyright 2016 The go-bitcoiin2g Authors
+// This file is part of the go-bitcoiin2g library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-bitcoiin2g library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
 
 package whisperv6
 
@@ -57,7 +57,7 @@ const (
 	bloomFilterToleranceIdx        // Bloom filter tolerated by the whisper node for a limited time
 )
 
-// Whisper represents a dark communication interface through the Ethereum
+// Whisper represents a dark communication interface through the Bitcoiin2g
 // network, using its very own P2P communication layer.
 type Whisper struct {
 	protocol p2p.Protocol // Protocol description and parameters
@@ -90,7 +90,7 @@ type Whisper struct {
 	mailServer MailServer // MailServer interface
 }
 
-// New creates a Whisper client ready to communicate through the Ethereum P2P network.
+// New creates a Whisper client ready to communicate through the Bitcoiin2g P2P network.
 func New(cfg *Config) *Whisper {
 	if cfg == nil {
 		cfg = &DefaultConfig

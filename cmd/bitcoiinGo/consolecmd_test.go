@@ -1,18 +1,18 @@
-// Copyright 2016 The go-ethereum Authors
-// This file is part of go-ethereum.
+// Copyright 2016 The go-bitcoiin2g Authors
+// This file is part of go-bitcoiin2g.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-bitcoiin2g is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-bitcoiin2g is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-bitcoiin2g. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -43,7 +43,7 @@ func TestConsoleWelcome(t *testing.T) {
 	// Start a bitcoiinGo console, make sure it's cleaned up and terminate the console
 	bitcoiinGo := runBitcoiinGo(t,
 		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase, "--shh",
+		"--bitcoiinbase", coinbase, "--shh",
 		"console")
 
 	// Gather all the infos the welcome message needs to contain
@@ -59,7 +59,7 @@ func TestConsoleWelcome(t *testing.T) {
 Welcome to the BitcoiinGo JavaScript console!
 
 instance: BitcoiinGo/v{{bitcoiinGover}}/{{goos}}-{{goarch}}/{{gover}}
-coinbase: {{.Etherbase}}
+coinbase: {{.Bitcoiinbase}}
 at block: 0 ({{niltime}})
  datadir: {{.Datadir}}
  modules: {{apis}}
@@ -85,7 +85,7 @@ func TestIPCAttachWelcome(t *testing.T) {
 	// list of ipc modules and shh is included there.
 	bitcoiinGo := runBitcoiinGo(t,
 		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase, "--shh", "--ipcpath", ipc)
+		"--bitcoiinbase", coinbase, "--shh", "--ipcpath", ipc)
 
 	time.Sleep(2 * time.Second) // Simple way to wait for the RPC endpoint to open
 	testAttachWelcome(t, bitcoiinGo, "ipc:"+ipc, ipcAPIs)
@@ -99,7 +99,7 @@ func TestHTTPAttachWelcome(t *testing.T) {
 	port := strconv.Itoa(trulyRandInt(1024, 65536)) // Yeah, sometimes this will fail, sorry :P
 	bitcoiinGo := runBitcoiinGo(t,
 		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase, "--rpc", "--rpcport", port)
+		"--bitcoiinbase", coinbase, "--rpc", "--rpcport", port)
 
 	time.Sleep(2 * time.Second) // Simple way to wait for the RPC endpoint to open
 	testAttachWelcome(t, bitcoiinGo, "http://localhost:"+port, httpAPIs)
@@ -114,7 +114,7 @@ func TestWSAttachWelcome(t *testing.T) {
 
 	bitcoiinGo := runBitcoiinGo(t,
 		"--port", "0", "--maxpeers", "0", "--nodiscover", "--nat", "none",
-		"--etherbase", coinbase, "--ws", "--wsport", port)
+		"--bitcoiinbase", coinbase, "--ws", "--wsport", port)
 
 	time.Sleep(2 * time.Second) // Simple way to wait for the RPC endpoint to open
 	testAttachWelcome(t, bitcoiinGo, "ws://localhost:"+port, httpAPIs)
@@ -134,7 +134,7 @@ func testAttachWelcome(t *testing.T, bitcoiinGo *testbitcoiinGo, endpoint, apis 
 	attach.SetTemplateFunc("goarch", func() string { return runtime.GOARCH })
 	attach.SetTemplateFunc("gover", runtime.Version)
 	attach.SetTemplateFunc("gethver", func() string { return params.Version })
-	attach.SetTemplateFunc("etherbase", func() string { return bitcoiinGo.Etherbase })
+	attach.SetTemplateFunc("bitcoiinbase", func() string { return bitcoiinGo.Bitcoiinbase })
 	attach.SetTemplateFunc("niltime", func() string { return time.Unix(0, 0).Format(time.RFC1123) })
 	attach.SetTemplateFunc("ipc", func() bool { return strings.HasPrefix(endpoint, "ipc") })
 	attach.SetTemplateFunc("datadir", func() string { return bitcoiinGo.Datadir })
@@ -145,7 +145,7 @@ func testAttachWelcome(t *testing.T, bitcoiinGo *testbitcoiinGo, endpoint, apis 
 Welcome to the BitcoiinGo JavaScript console!
 
 instance: BitcoiinGo/v{{bitcoiinGover}}/{{goos}}-{{goarch}}/{{gover}}
-coinbase: {{etherbase}}
+coinbase: {{bitcoiinbase}}
 at block: 0 ({{niltime}}){{if ipc}}
  datadir: {{datadir}}{{end}}
  modules: {{apis}}

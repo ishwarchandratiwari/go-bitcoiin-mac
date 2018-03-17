@@ -1,18 +1,18 @@
-// Copyright 2016 The go-ethereum Authors
-// This file is part of go-ethereum.
+// Copyright 2016 The go-bitcoiin2g Authors
+// This file is part of go-bitcoiin2g.
 //
-// go-ethereum is free software: you can redistribute it and/or modify
+// go-bitcoiin2g is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-ethereum is distributed in the hope that it will be useful,
+// go-bitcoiin2g is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
+// along with go-bitcoiin2g. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -22,8 +22,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/docker/docker/pkg/reexec"
 	"github.com/bitcoiinBT2/go-bitcoiin/internal/cmdtest"
+	"github.com/docker/docker/pkg/reexec"
 )
 
 func tmpdir(t *testing.T) string {
@@ -38,8 +38,8 @@ type testbitcoiinGo struct {
 	*cmdtest.TestCmd
 
 	// template variables for expect
-	Datadir   string
-	Etherbase string
+	Datadir      string
+	Bitcoiinbase string
 }
 
 func init() {
@@ -72,9 +72,9 @@ func runBitcoiinGo(t *testing.T, args ...string) *testbitcoiinGo {
 			if i < len(args)-1 {
 				tt.Datadir = args[i+1]
 			}
-		case arg == "-etherbase" || arg == "--etherbase":
+		case arg == "-bitcoiinbase" || arg == "--bitcoiinbase":
 			if i < len(args)-1 {
-				tt.Etherbase = args[i+1]
+				tt.Bitcoiinbase = args[i+1]
 			}
 		}
 	}

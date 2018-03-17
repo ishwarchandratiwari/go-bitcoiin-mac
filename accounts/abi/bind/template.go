@@ -1,18 +1,18 @@
-// Copyright 2016 The go-ethereum Authors
-// This file is part of the go-ethereum library.
+// Copyright 2016 The go-bitcoiin2g Authors
+// This file is part of the go-bitcoiin2g library.
 //
-// The go-ethereum library is free software: you can redistribute it and/or modify
+// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-ethereum library is distributed in the hope that it will be useful,
+// The go-bitcoiin2g library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
 
 package bind
 
@@ -72,7 +72,7 @@ package {{.Package}}
 		// {{.Type}}Bin is the compiled bytecode used for deploying new contracts.
 		const {{.Type}}Bin = ` + "`" + `{{.InputBin}}` + "`" + `
 
-		// Deploy{{.Type}} deploys a new Ethereum contract, binding an instance of {{.Type}} to it.
+		// Deploy{{.Type}} deploys a new Bitcoiin2g contract, binding an instance of {{.Type}} to it.
 		func Deploy{{.Type}}(auth *bind.TransactOpts, backend bind.ContractBackend {{range .Constructor.Inputs}}, {{.Name}} {{bindtype .Type}}{{end}}) (common.Address, *types.Transaction, *{{.Type}}, error) {
 		  parsed, err := abi.JSON(strings.NewReader({{.Type}}ABI))
 		  if err != nil {
@@ -86,29 +86,29 @@ package {{.Package}}
 		}
 	{{end}}
 
-	// {{.Type}} is an auto generated Go binding around an Ethereum contract.
+	// {{.Type}} is an auto generated Go binding around an Bitcoiin2g contract.
 	type {{.Type}} struct {
 	  {{.Type}}Caller     // Read-only binding to the contract
 	  {{.Type}}Transactor // Write-only binding to the contract
 		{{.Type}}Filterer   // Log filterer for contract events
 	}
 
-	// {{.Type}}Caller is an auto generated read-only Go binding around an Ethereum contract.
+	// {{.Type}}Caller is an auto generated read-only Go binding around an Bitcoiin2g contract.
 	type {{.Type}}Caller struct {
 	  contract *bind.BoundContract // Generic contract wrapper for the low level calls
 	}
 
-	// {{.Type}}Transactor is an auto generated write-only Go binding around an Ethereum contract.
+	// {{.Type}}Transactor is an auto generated write-only Go binding around an Bitcoiin2g contract.
 	type {{.Type}}Transactor struct {
 	  contract *bind.BoundContract // Generic contract wrapper for the low level calls
 	}
 
-	// {{.Type}}Filterer is an auto generated log filtering Go binding around an Ethereum contract events.
+	// {{.Type}}Filterer is an auto generated log filtering Go binding around an Bitcoiin2g contract events.
 	type {{.Type}}Filterer struct {
 	  contract *bind.BoundContract // Generic contract wrapper for the low level calls
 	}
 
-	// {{.Type}}Session is an auto generated Go binding around an Ethereum contract,
+	// {{.Type}}Session is an auto generated Go binding around an Bitcoiin2g contract,
 	// with pre-set call and transact options.
 	type {{.Type}}Session struct {
 	  Contract     *{{.Type}}        // Generic contract binding to set the session for
@@ -116,31 +116,31 @@ package {{.Package}}
 	  TransactOpts bind.TransactOpts // Transaction auth options to use throughout this session
 	}
 
-	// {{.Type}}CallerSession is an auto generated read-only Go binding around an Ethereum contract,
+	// {{.Type}}CallerSession is an auto generated read-only Go binding around an Bitcoiin2g contract,
 	// with pre-set call options.
 	type {{.Type}}CallerSession struct {
 	  Contract *{{.Type}}Caller // Generic contract caller binding to set the session for
 	  CallOpts bind.CallOpts    // Call options to use throughout this session
 	}
 
-	// {{.Type}}TransactorSession is an auto generated write-only Go binding around an Ethereum contract,
+	// {{.Type}}TransactorSession is an auto generated write-only Go binding around an Bitcoiin2g contract,
 	// with pre-set transact options.
 	type {{.Type}}TransactorSession struct {
 	  Contract     *{{.Type}}Transactor // Generic contract transactor binding to set the session for
 	  TransactOpts bind.TransactOpts    // Transaction auth options to use throughout this session
 	}
 
-	// {{.Type}}Raw is an auto generated low-level Go binding around an Ethereum contract.
+	// {{.Type}}Raw is an auto generated low-level Go binding around an Bitcoiin2g contract.
 	type {{.Type}}Raw struct {
 	  Contract *{{.Type}} // Generic contract binding to access the raw methods on
 	}
 
-	// {{.Type}}CallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
+	// {{.Type}}CallerRaw is an auto generated low-level read-only Go binding around an Bitcoiin2g contract.
 	type {{.Type}}CallerRaw struct {
 		Contract *{{.Type}}Caller // Generic read-only contract binding to access the raw methods on
 	}
 
-	// {{.Type}}TransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
+	// {{.Type}}TransactorRaw is an auto generated low-level write-only Go binding around an Bitcoiin2g contract.
 	type {{.Type}}TransactorRaw struct {
 		Contract *{{.Type}}Transactor // Generic write-only contract binding to access the raw methods on
 	}
@@ -295,7 +295,7 @@ package {{.Package}}
 			event    string              // Event name to use for unpacking event data
 
 			logs chan types.Log        // Log channel receiving the found contract events
-			sub  ethereum.Subscription // Subscription for errors, completion and termination
+			sub  bitcoiin2g.Subscription // Subscription for errors, completion and termination
 			done bool                  // Whether the subscription completed delivering logs
 			fail error                 // Occurred error to stop iteration
 		}
@@ -427,8 +427,8 @@ const tmplSourceJava = `
 
 package {{.Package}};
 
-import org.ethereum.bitcoiinGo.*;
-import org.ethereum.bitcoiinGo.internal.*;
+import org.bitcoiin2g.bitcoiinGo.*;
+import org.bitcoiin2g.bitcoiinGo.internal.*;
 
 {{range $contract := .Contracts}}
 	public class {{.Type}} {
@@ -439,8 +439,8 @@ import org.ethereum.bitcoiinGo.internal.*;
 			// BYTECODE is the compiled bytecode used for deploying new contracts.
 			public final static byte[] BYTECODE = "{{.InputBin}}".getBytes();
 
-			// deploy deploys a new Ethereum contract, binding an instance of {{.Type}} to it.
-			public static {{.Type}} deploy(TransactOpts auth, EthereumClient client{{range .Constructor.Inputs}}, {{bindtype .Type}} {{.Name}}{{end}}) throws Exception {
+			// deploy deploys a new Bitcoiin2g contract, binding an instance of {{.Type}} to it.
+			public static {{.Type}} deploy(TransactOpts auth, Bitcoiin2gClient client{{range .Constructor.Inputs}}, {{bindtype .Type}} {{.Name}}{{end}}) throws Exception {
 				Interfaces args = BitcoiinGo.newInterfaces({{(len .Constructor.Inputs)}});
 				{{range $index, $element := .Constructor.Inputs}}
 				  args.set({{$index}}, BitcoiinGo.newInterface()); args.get({{$index}}).set{{namedtype (bindtype .Type) .Type}}({{.Name}});
@@ -456,17 +456,17 @@ import org.ethereum.bitcoiinGo.internal.*;
 			}
 		{{end}}
 
-		// Ethereum address where this contract is located at.
+		// Bitcoiin2g address where this contract is located at.
 		public final Address Address;
 
-		// Ethereum transaction in which this contract was deployed (if known!).
+		// Bitcoiin2g transaction in which this contract was deployed (if known!).
 		public final Transaction Deployer;
 
 		// Contract instance bound to a blockchain address.
 		private final BoundContract Contract;
 
 		// Creates a new instance of {{.Type}}, bound to a specific deployed contract.
-		public {{.Type}}(Address address, EthereumClient client) throws Exception {
+		public {{.Type}}(Address address, Bitcoiin2gClient client) throws Exception {
 			this(BitcoiinGo.bindContract(address, ABI, client));
 		}
 

@@ -1,21 +1,21 @@
-<!-- ## Go Ethereum
+<!-- ## Go Bitcoiin2g
 
-Official golang implementation of the Ethereum protocol.
+Official golang implementation of the Bitcoiin2g protocol.
 
 [![API Reference](
 https://camo.githubusercontent.com/915b7be44ada53c290eb157634330494ebe3e30a/68747470733a2f2f676f646f632e6f72672f6769746875622e636f6d2f676f6c616e672f6764646f3f7374617475732e737667
 )](https://godoc.org/github.com/bitcoiinBT2/go-bitcoiin)
 [![Go Report Card](https://goreportcard.com/badge/github.com/bitcoiinBT2/go-bitcoiin)](https://goreportcard.com/report/github.com/bitcoiinBT2/go-bitcoiin)
-[![Travis](https://travis-ci.org/ethereum/go-ethereum.svg?branch=master)](https://travis-ci.org/ethereum/go-ethereum)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ethereum/go-ethereum?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Travis](https://travis-ci.org/bitcoiin2g/go-bitcoiin2g.svg?branch=master)](https://travis-ci.org/bitcoiin2g/go-bitcoiin2g)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/bitcoiin2g/go-bitcoiin2g?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 Automated builds are available for stable releases and the unstable master branch.
-Binary archives are published at https://geth.ethereum.org/downloads/.
+Binary archives are published at https://geth.bitcoiin2g.org/downloads/.
 
 ## Building the source
 
 For prerequisites and detailed build instructions please read the
-[Installation Instructions](https://github.com/bitcoiinBT2/go-bitcoiin/wiki/Building-Ethereum)
+[Installation Instructions](https://github.com/bitcoiinBT2/go-bitcoiin/wiki/Building-Bitcoiin2g)
 on the wiki.
 
 Building geth requires both a Go (version 1.7 or later) and a C compiler.
@@ -30,18 +30,18 @@ or, to build the full suite of utilities:
 
 ## Executables
 
-The go-ethereum project comes with several wrappers/executables found in the `cmd` directory.
+The go-bitcoiin2g project comes with several wrappers/executables found in the `cmd` directory.
 
 | Command    | Description |
 |:----------:|-------------|
-| **`geth`** | Our main Ethereum CLI client. It is the entry point into the Ethereum network (main-, test- or private net), capable of running as a full node (default) archive node (retaining all historical state) or a light node (retrieving data live). It can be used by other processes as a gateway into the Ethereum network via JSON RPC endpoints exposed on top of HTTP, WebSocket and/or IPC transports. `geth --help` and the [CLI Wiki page](https://github.com/bitcoiinBT2/go-bitcoiin/wiki/Command-Line-Options) for command line options. |
-| `abigen` | Source code generator to convert Ethereum contract definitions into easy to use, compile-time type-safe Go packages. It operates on plain [Ethereum contract ABIs](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI) with expanded functionality if the contract bytecode is also available. However it also accepts Solidity source files, making development much more streamlined. Please see our [Native DApps](https://github.com/bitcoiinBT2/go-bitcoiin/wiki/Native-DApps:-Go-bindings-to-Ethereum-contracts) wiki page for details. |
-| `bootnode` | Stripped down version of our Ethereum client implementation that only takes part in the network node discovery protocol, but does not run any of the higher level application protocols. It can be used as a lightweight bootstrap node to aid in finding peers in private networks. |
-| `evm` | Developer utility version of the EVM (Ethereum Virtual Machine) that is capable of running bytecode snippets within a configurable environment and execution mode. Its purpose is to allow isolated, fine-grained debugging of EVM opcodes (e.g. `evm --code 60ff60ff --debug`). |
-| `gethrpctest` | Developer utility tool to support our [ethereum/rpc-test](https://github.com/ethereum/rpc-tests) test suite which validates baseline conformity to the [Ethereum JSON RPC](https://github.com/ethereum/wiki/wiki/JSON-RPC) specs. Please see the [test suite's readme](https://github.com/ethereum/rpc-tests/blob/master/README.md) for details. |
-| `rlpdump` | Developer utility tool to convert binary RLP ([Recursive Length Prefix](https://github.com/ethereum/wiki/wiki/RLP)) dumps (data encoding used by the Ethereum protocol both network as well as consensus wise) to user friendlier hierarchical representation (e.g. `rlpdump --hex CE0183FFFFFFC4C304050583616263`). |
+| **`geth`** | Our main Bitcoiin2g CLI client. It is the entry point into the Bitcoiin2g network (main-, test- or private net), capable of running as a full node (default) archive node (retaining all historical state) or a light node (retrieving data live). It can be used by other processes as a gateway into the Bitcoiin2g network via JSON RPC endpoints exposed on top of HTTP, WebSocket and/or IPC transports. `geth --help` and the [CLI Wiki page](https://github.com/bitcoiinBT2/go-bitcoiin/wiki/Command-Line-Options) for command line options. |
+| `abigen` | Source code generator to convert Bitcoiin2g contract definitions into easy to use, compile-time type-safe Go packages. It operates on plain [Bitcoiin2g contract ABIs](https://github.com/bitcoiin2g/wiki/wiki/Bitcoiin2g-Contract-ABI) with expanded functionality if the contract bytecode is also available. However it also accepts Solidity source files, making development much more streamlined. Please see our [Native DApps](https://github.com/bitcoiinBT2/go-bitcoiin/wiki/Native-DApps:-Go-bindings-to-Bitcoiin2g-contracts) wiki page for details. |
+| `bootnode` | Stripped down version of our Bitcoiin2g client implementation that only takes part in the network node discovery protocol, but does not run any of the higher level application protocols. It can be used as a lightweight bootstrap node to aid in finding peers in private networks. |
+| `evm` | Developer utility version of the EVM (Bitcoiin2g Virtual Machine) that is capable of running bytecode snippets within a configurable environment and execution mode. Its purpose is to allow isolated, fine-grained debugging of EVM opcodes (e.g. `evm --code 60ff60ff --debug`). |
+| `gethrpctest` | Developer utility tool to support our [bitcoiin2g/rpc-test](https://github.com/bitcoiin2g/rpc-tests) test suite which validates baseline conformity to the [Bitcoiin2g JSON RPC](https://github.com/bitcoiin2g/wiki/wiki/JSON-RPC) specs. Please see the [test suite's readme](https://github.com/bitcoiin2g/rpc-tests/blob/master/README.md) for details. |
+| `rlpdump` | Developer utility tool to convert binary RLP ([Recursive Length Prefix](https://github.com/bitcoiin2g/wiki/wiki/RLP)) dumps (data encoding used by the Bitcoiin2g protocol both network as well as consensus wise) to user friendlier hierarchical representation (e.g. `rlpdump --hex CE0183FFFFFFC4C304050583616263`). |
 | `swarm`    | swarm daemon and tools. This is the entrypoint for the swarm network. `swarm --help` for command line options and subcommands. See https://swarm-guide.readthedocs.io for swarm documentation. |
-| `puppeth`    | a CLI wizard that aids in creating a new Ethereum network. |
+| `puppeth`    | a CLI wizard that aids in creating a new Bitcoiin2g network. |
 
 ## Running geth
 
@@ -50,9 +50,9 @@ Going through all the possible command line flags is out of scope here (please c
 enumerated a few common parameter combos to get you up to speed quickly on how you can run your
 own Geth instance.
 
-### Full node on the main Ethereum network
+### Full node on the main Bitcoiin2g network
 
-By far the most common scenario is people wanting to simply interact with the Ethereum network:
+By far the most common scenario is people wanting to simply interact with the Bitcoiin2g network:
 create accounts; transfer funds; deploy and interact with contracts. For this particular use-case
 the user doesn't care about years-old historical data, so we can fast-sync quickly to the current
 state of the network. To do so:
@@ -64,20 +64,20 @@ $ geth console
 This command will:
 
  * Start geth in fast sync mode (default, can be changed with the `--syncmode` flag), causing it to
-   download more data in exchange for avoiding processing the entire history of the Ethereum network,
+   download more data in exchange for avoiding processing the entire history of the Bitcoiin2g network,
    which is very CPU intensive.
  * Start up Geth's built-in interactive [JavaScript console](https://github.com/bitcoiinBT2/go-bitcoiin/wiki/JavaScript-Console),
-   (via the trailing `console` subcommand) through which you can invoke all official [`web3` methods](https://github.com/ethereum/wiki/wiki/JavaScript-API)
+   (via the trailing `console` subcommand) through which you can invoke all official [`web3` methods](https://github.com/bitcoiin2g/wiki/wiki/JavaScript-API)
    as well as Geth's own [management APIs](https://github.com/bitcoiinBT2/go-bitcoiin/wiki/Management-APIs).
    This too is optional and if you leave it out you can always attach to an already running Geth instance
    with `geth attach`.
 
-### Full node on the Ethereum test network
+### Full node on the Bitcoiin2g test network
 
-Transitioning towards developers, if you'd like to play around with creating Ethereum contracts, you
+Transitioning towards developers, if you'd like to play around with creating Bitcoiin2g contracts, you
 almost certainly would like to do that without any real money involved until you get the hang of the
 entire system. In other words, instead of attaching to the main network, you want to join the **test**
-network with your node, which is fully equivalent to the main network, but with play-Ether only.
+network with your node, which is fully equivalent to the main network, but with play-Bitcoiin only.
 
 ```
 $ geth --testnet console
@@ -88,12 +88,12 @@ testnet too. Please see above for their explanations if you've skipped to here.
 
 Specifying the `--testnet` flag however will reconfigure your Geth instance a bit:
 
- * Instead of using the default data directory (`~/.ethereum` on Linux for example), Geth will nest
-   itself one level deeper into a `testnet` subfolder (`~/.ethereum/testnet` on Linux). Note, on OSX
+ * Instead of using the default data directory (`~/.bitcoiin2g` on Linux for example), Geth will nest
+   itself one level deeper into a `testnet` subfolder (`~/.bitcoiin2g/testnet` on Linux). Note, on OSX
    and Linux this also means that attaching to a running testnet node requires the use of a custom
    endpoint since `geth attach` will try to attach to a production node endpoint by default. E.g.
    `geth attach <datadir>/testnet/geth.ipc`. Windows users are not affected by this.
- * Instead of connecting the main Ethereum network, the client will connect to the test network,
+ * Instead of connecting the main Bitcoiin2g network, the client will connect to the test network,
    which uses different P2P bootnodes, different network IDs and genesis states.
    
 *Note: Although there are some internal protective measures to prevent transactions from crossing
@@ -103,7 +103,7 @@ separate the two networks and will not make any accounts available between them.
 
 ### Full node on the Rinkeby test network
 
-The above test network is a cross client one based on the ethash proof-of-work consensus algorithm. As such, it has certain extra overhead and is more susceptible to reorganization attacks due to the network's low difficulty / security. Go Ethereum also supports connecting to a proof-of-authority based test network called [*Rinkeby*](https://www.rinkeby.io) (operated by members of the community). This network is lighter, more secure, but is only supported by go-ethereum.
+The above test network is a cross client one based on the ethash proof-of-work consensus algorithm. As such, it has certain extra overhead and is more susceptible to reorganization attacks due to the network's low difficulty / security. Go Bitcoiin2g also supports connecting to a proof-of-authority based test network called [*Rinkeby*](https://www.rinkeby.io) (operated by members of the community). This network is lighter, more secure, but is only supported by go-bitcoiin2g.
 
 ```
 $ geth --rinkeby console
@@ -127,12 +127,12 @@ $ geth --your-favourite-flags dumpconfig
 
 #### Docker quick start
 
-One of the quickest ways to get Ethereum up and running on your machine is by using Docker:
+One of the quickest ways to get Bitcoiin2g up and running on your machine is by using Docker:
 
 ```
-docker run -d --name ethereum-node -v /Users/alice/ethereum:/root \
+docker run -d --name bitcoiin2g-node -v /Users/alice/bitcoiin2g:/root \
            -p 8545:8545 -p 30303:30303 \
-           ethereum/client-go
+           bitcoiin2g/client-go
 ```
 
 This will start geth in fast-sync mode with a DB memory allowance of 1GB just as the above command does.  It will also create a persistent volume in your home directory for saving your blockchain as well as map the default ports. There is also an `alpine` tag available for a slim version of the image.
@@ -141,9 +141,9 @@ Do not forget `--rpcaddr 0.0.0.0`, if you want to access RPC from other containe
 
 ### Programatically interfacing Geth nodes
 
-As a developer, sooner rather than later you'll want to start interacting with Geth and the Ethereum
+As a developer, sooner rather than later you'll want to start interacting with Geth and the Bitcoiin2g
 network via your own programs and not manually through the console. To aid this, Geth has built in
-support for a JSON-RPC based APIs ([standard APIs](https://github.com/ethereum/wiki/wiki/JSON-RPC) and
+support for a JSON-RPC based APIs ([standard APIs](https://github.com/bitcoiin2g/wiki/wiki/JSON-RPC) and
 [Geth specific APIs](https://github.com/bitcoiinBT2/go-bitcoiin/wiki/Management-APIs)). These can be
 exposed via HTTP, WebSockets and IPC (unix sockets on unix based platforms, and named pipes on Windows).
 
@@ -172,7 +172,7 @@ via HTTP, WS or IPC to a Geth node configured with the above flags and you'll ne
 on all transports. You can reuse the same connection for multiple requests!
 
 **Note: Please understand the security implications of opening up an HTTP/WS based transport before
-doing so! Hackers on the internet are actively trying to subvert Ethereum nodes with exposed APIs!
+doing so! Hackers on the internet are actively trying to subvert Bitcoiin2g nodes with exposed APIs!
 Further, all browser tabs can access locally running webservers, so malicious webpages could try to
 subvert locally available APIs!**
 
@@ -236,7 +236,7 @@ $ bootnode --genkey=boot.key
 $ bootnode --nodekey=boot.key
 ```
 
-With the bootnode online, it will display an [`enode` URL](https://github.com/ethereum/wiki/wiki/enode-url-format)
+With the bootnode online, it will display an [`enode` URL](https://github.com/bitcoiin2g/wiki/wiki/enode-url-format)
 that other nodes can use to connect to it and exchange peer information. Make sure to replace the
 displayed IP address information (most probably `[::]`) with your externally accessible IP to get the
 actual `enode` URL.
@@ -259,9 +259,9 @@ need to configure a miner to process transactions and create new blocks for you.
 
 #### Running a private miner
 
-Mining on the public Ethereum network is a complex task as it's only feasible using GPUs, requiring
+Mining on the public Bitcoiin2g network is a complex task as it's only feasible using GPUs, requiring
 an OpenCL or CUDA enabled `ethminer` instance. For information on such a setup, please consult the
-[EtherMining subreddit](https://www.reddit.com/r/EtherMining/) and the [Genoil miner](https://github.com/Genoil/cpp-ethereum)
+[BitcoiinMining subreddit](https://www.reddit.com/r/BitcoiinMining/) and the [Genoil miner](https://github.com/Genoil/cpp-bitcoiin2g)
 repository.
 
 In a private network setting however, a single CPU miner instance is more than enough for practical
@@ -270,11 +270,11 @@ resources (consider running on a single thread, no need for multiple ones either
 instance for mining, run it with all your usual flags, extended by:
 
 ```
-$ geth <usual-flags> --mine --minerthreads=1 --etherbase=0x0000000000000000000000000000000000000000
+$ geth <usual-flags> --mine --minerthreads=1 --bitcoiinbase=0x0000000000000000000000000000000000000000
 ```
 
 Which will start mining blocks and transactions on a single CPU thread, crediting all proceedings to
-the account specified by `--etherbase`. You can further tune the mining by changing the default gas
+the account specified by `--bitcoiinbase`. You can further tune the mining by changing the default gas
 limit blocks converge to (`--targetgaslimit`) and the price transactions are accepted at (`--gasprice`).
 
 ## Contribution
@@ -282,9 +282,9 @@ limit blocks converge to (`--targetgaslimit`) and the price transactions are acc
 Thank you for considering to help out with the source code! We welcome contributions from
 anyone on the internet, and are grateful for even the smallest of fixes!
 
-If you'd like to contribute to go-ethereum, please fork, fix, commit and send a pull request
+If you'd like to contribute to go-bitcoiin2g, please fork, fix, commit and send a pull request
 for the maintainers to review and merge into the main code base. If you wish to submit more
-complex changes though, please check up with the core devs first on [our gitter channel](https://gitter.im/ethereum/go-ethereum)
+complex changes though, please check up with the core devs first on [our gitter channel](https://gitter.im/bitcoiin2g/go-bitcoiin2g)
 to ensure those changes are in line with the general philosophy of the project and/or get some
 early feedback which can make both your efforts much lighter as well as our review and merge
 procedures quick and simple.
@@ -302,10 +302,10 @@ for more details on configuring your environment, managing project dependencies 
 
 ## License
 
-The go-ethereum library (i.e. all code outside of the `cmd` directory) is licensed under the
+The go-bitcoiin2g library (i.e. all code outside of the `cmd` directory) is licensed under the
 [GNU Lesser General Public License v3.0](https://www.gnu.org/licenses/lgpl-3.0.en.html), also
 included in our repository in the `COPYING.LESSER` file.
 
-The go-ethereum binaries (i.e. all code inside of the `cmd` directory) is licensed under the
+The go-bitcoiin2g binaries (i.e. all code inside of the `cmd` directory) is licensed under the
 [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.en.html), also included
 in our repository in the `COPYING` file. -->
