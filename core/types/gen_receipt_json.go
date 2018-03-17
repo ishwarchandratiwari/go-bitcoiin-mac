@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/bitcoiinBT2/go-bitcoiin/common"
+	"github.com/bitcoiinBT2/go-bitcoiin/common/hexutil"
 )
 
 var _ = (*receiptMarshaling)(nil)

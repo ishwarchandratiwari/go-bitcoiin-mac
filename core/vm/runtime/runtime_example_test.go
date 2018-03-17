@@ -19,8 +19,8 @@ package runtime_test
 import (
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/vm/runtime"
+	"github.com/bitcoiinBT2/go-bitcoiin/common"
+	"github.com/bitcoiinBT2/go-bitcoiin/core/vm/runtime"
 )
 
 func ExampleExecute() {

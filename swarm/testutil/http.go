@@ -22,9 +22,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/swarm/api"
-	httpapi "github.com/ethereum/go-ethereum/swarm/api/http"
-	"github.com/ethereum/go-ethereum/swarm/storage"
+	"github.com/bitcoiinBT2/go-bitcoiin/swarm/api"
+	httpapi "github.com/bitcoiinBT2/go-bitcoiin/swarm/api/http"
+	"github.com/bitcoiinBT2/go-bitcoiin/swarm/storage"
 )
 
 func NewTestSwarmServer(t *testing.T) *TestSwarmServer {

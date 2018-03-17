@@ -21,9 +21,9 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/bitcoiinBT2/go-bitcoiin/core/state"
+	"github.com/bitcoiinBT2/go-bitcoiin/core/types"
+	"github.com/bitcoiinBT2/go-bitcoiin/params"
 )
 
 var (

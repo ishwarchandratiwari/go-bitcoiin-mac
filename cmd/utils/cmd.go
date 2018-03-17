@@ -27,12 +27,12 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/internal/debug"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/node"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/bitcoiinBT2/go-bitcoiin/core"
+	"github.com/bitcoiinBT2/go-bitcoiin/core/types"
+	"github.com/bitcoiinBT2/go-bitcoiin/internal/debug"
+	"github.com/bitcoiinBT2/go-bitcoiin/log"
+	"github.com/bitcoiinBT2/go-bitcoiin/node"
+	"github.com/bitcoiinBT2/go-bitcoiin/rlp"
 )
 
 const (

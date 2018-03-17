@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/bitcoiinBT2/go-bitcoiin/params"
 )
 
 // This table defines supported forks and their chain config.

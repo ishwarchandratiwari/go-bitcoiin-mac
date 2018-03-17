@@ -26,13 +26,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/eth"
-	"github.com/ethereum/go-ethereum/les/flowcontrol"
-	"github.com/ethereum/go-ethereum/light"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/bitcoiinBT2/go-bitcoiin/common"
+	"github.com/bitcoiinBT2/go-bitcoiin/core/types"
+	"github.com/bitcoiinBT2/go-bitcoiin/eth"
+	"github.com/bitcoiinBT2/go-bitcoiin/les/flowcontrol"
+	"github.com/bitcoiinBT2/go-bitcoiin/light"
+	"github.com/bitcoiinBT2/go-bitcoiin/p2p"
+	"github.com/bitcoiinBT2/go-bitcoiin/rlp"
 )
 
 var (

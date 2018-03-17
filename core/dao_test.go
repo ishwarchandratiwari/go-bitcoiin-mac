@@ -20,10 +20,10 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/consensus/ethash"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/bitcoiinBT2/go-bitcoiin/consensus/ethash"
+	"github.com/bitcoiinBT2/go-bitcoiin/core/vm"
+	"github.com/bitcoiinBT2/go-bitcoiin/ethdb"
+	"github.com/bitcoiinBT2/go-bitcoiin/params"
 )
 
 // Tests that DAO-fork enabled clients can properly filter out fork-commencing

@@ -20,9 +20,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/bitcoiinBT2/go-bitcoiin/common"
+	"github.com/bitcoiinBT2/go-bitcoiin/ethdb"
+	"github.com/bitcoiinBT2/go-bitcoiin/log"
 )
 
 // secureKeyPrefix is the database key prefix used to store trie node preimages.

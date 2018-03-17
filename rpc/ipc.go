@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/bitcoiinBT2/go-bitcoiin/log"
 )
 
 // CreateIPCListener creates an listener, on Unix platforms this is a unix socket, on

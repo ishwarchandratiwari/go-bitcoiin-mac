@@ -27,16 +27,16 @@ import (
 
 	goruntime "runtime"
 
-	"github.com/ethereum/go-ethereum/cmd/evm/internal/compiler"
-	"github.com/ethereum/go-ethereum/cmd/utils"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/core/vm/runtime"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/bitcoiinBT2/go-bitcoiin/cmd/evm/internal/compiler"
+	"github.com/bitcoiinBT2/go-bitcoiin/cmd/utils"
+	"github.com/bitcoiinBT2/go-bitcoiin/common"
+	"github.com/bitcoiinBT2/go-bitcoiin/core"
+	"github.com/bitcoiinBT2/go-bitcoiin/core/state"
+	"github.com/bitcoiinBT2/go-bitcoiin/core/vm"
+	"github.com/bitcoiinBT2/go-bitcoiin/core/vm/runtime"
+	"github.com/bitcoiinBT2/go-bitcoiin/ethdb"
+	"github.com/bitcoiinBT2/go-bitcoiin/log"
+	"github.com/bitcoiinBT2/go-bitcoiin/params"
 	cli "gopkg.in/urfave/cli.v1"
 )
 

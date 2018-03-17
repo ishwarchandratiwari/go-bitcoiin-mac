@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/ethereum/go-ethereum/metrics"
+	"github.com/bitcoiinBT2/go-bitcoiin/metrics"
 )
 
 type exp struct {

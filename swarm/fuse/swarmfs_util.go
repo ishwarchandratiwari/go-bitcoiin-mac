@@ -24,7 +24,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/ethereum/go-ethereum/log"
+	"github.com/bitcoiinBT2/go-bitcoiin/log"
 )
 
 func externalUnmount(mountPoint string) error {

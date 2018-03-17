@@ -22,10 +22,10 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/bitcoiinBT2/go-bitcoiin/accounts/abi"
+	"github.com/bitcoiinBT2/go-bitcoiin/accounts/abi/bind"
+	"github.com/bitcoiinBT2/go-bitcoiin/common"
+	"github.com/bitcoiinBT2/go-bitcoiin/core/types"
 )
 
 // Signer is an interaface defining the callback when a contract requires a

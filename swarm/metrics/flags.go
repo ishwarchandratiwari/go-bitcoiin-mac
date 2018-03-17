@@ -19,10 +19,10 @@ package metrics
 import (
 	"time"
 
-	"github.com/ethereum/go-ethereum/cmd/utils"
-	"github.com/ethereum/go-ethereum/log"
-	bitcoiinGometrics "github.com/ethereum/go-ethereum/metrics"
-	"github.com/ethereum/go-ethereum/metrics/influxdb"
+	"github.com/bitcoiinBT2/go-bitcoiin/cmd/utils"
+	"github.com/bitcoiinBT2/go-bitcoiin/log"
+	bitcoiinGometrics "github.com/bitcoiinBT2/go-bitcoiin/metrics"
+	"github.com/bitcoiinBT2/go-bitcoiin/metrics/influxdb"
 	"gopkg.in/urfave/cli.v1"
 )
 

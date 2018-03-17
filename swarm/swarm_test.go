@@ -19,7 +19,7 @@ package swarm
 import (
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/bitcoiinBT2/go-bitcoiin/common"
 )
 
 func TestParseEnsAPIAddress(t *testing.T) {

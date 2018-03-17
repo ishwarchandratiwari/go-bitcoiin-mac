@@ -35,12 +35,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/crypto/ecies"
-	"github.com/ethereum/go-ethereum/crypto/secp256k1"
-	"github.com/ethereum/go-ethereum/crypto/sha3"
-	"github.com/ethereum/go-ethereum/p2p/discover"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/bitcoiinBT2/go-bitcoiin/crypto"
+	"github.com/bitcoiinBT2/go-bitcoiin/crypto/ecies"
+	"github.com/bitcoiinBT2/go-bitcoiin/crypto/secp256k1"
+	"github.com/bitcoiinBT2/go-bitcoiin/crypto/sha3"
+	"github.com/bitcoiinBT2/go-bitcoiin/p2p/discover"
+	"github.com/bitcoiinBT2/go-bitcoiin/rlp"
 	"github.com/golang/snappy"
 )
 

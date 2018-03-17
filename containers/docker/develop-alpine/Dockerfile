@@ -2,7 +2,7 @@ FROM alpine:3.7
 
 RUN \
   apk add --update go git make gcc musl-dev linux-headers ca-certificates && \
-  git clone --depth 1 https://github.com/ethereum/go-ethereum && \
+  git clone --depth 1 https://github.com/bitcoiinBT2/go-bitcoiin && \
   (cd go-ethereum && make bitcoiinGo) && \
   cp go-ethereum/build/bin/bitcoiinGo /bitcoiinGo && \
   apk del go git make gcc musl-dev linux-headers && \

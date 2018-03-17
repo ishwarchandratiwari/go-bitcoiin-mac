@@ -21,8 +21,8 @@ package bitcoiinGo
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/bitcoiinBT2/go-bitcoiin/core/types"
+	"github.com/bitcoiinBT2/go-bitcoiin/ethclient"
 )
 
 // EthereumClient provides access to the Ethereum APIs.

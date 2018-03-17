@@ -24,8 +24,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common/compiler"
+	"github.com/bitcoiinBT2/go-bitcoiin/accounts/abi/bind"
+	"github.com/bitcoiinBT2/go-bitcoiin/common/compiler"
 )
 
 var (

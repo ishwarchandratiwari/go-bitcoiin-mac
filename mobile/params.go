@@ -21,9 +21,9 @@ package bitcoiinGo
 import (
 	"encoding/json"
 
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/p2p/discv5"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/bitcoiinBT2/go-bitcoiin/core"
+	"github.com/bitcoiinBT2/go-bitcoiin/p2p/discv5"
+	"github.com/bitcoiinBT2/go-bitcoiin/params"
 )
 
 // MainnetGenesis returns the JSON spec to use for the main Ethereum network. It

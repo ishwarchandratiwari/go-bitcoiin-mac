@@ -21,8 +21,8 @@ package bitcoiinGo
 import (
 	"errors"
 
-	ethereum "github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/common"
+	ethereum "github.com/bitcoiinBT2/go-bitcoiin"
+	"github.com/bitcoiinBT2/go-bitcoiin/common"
 )
 
 // Subscription represents an event subscription where events are

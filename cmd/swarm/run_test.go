@@ -27,13 +27,13 @@ import (
 	"time"
 
 	"github.com/docker/docker/pkg/reexec"
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/internal/cmdtest"
-	"github.com/ethereum/go-ethereum/node"
-	"github.com/ethereum/go-ethereum/p2p"
-	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/ethereum/go-ethereum/swarm"
+	"github.com/bitcoiinBT2/go-bitcoiin/accounts"
+	"github.com/bitcoiinBT2/go-bitcoiin/accounts/keystore"
+	"github.com/bitcoiinBT2/go-bitcoiin/internal/cmdtest"
+	"github.com/bitcoiinBT2/go-bitcoiin/node"
+	"github.com/bitcoiinBT2/go-bitcoiin/p2p"
+	"github.com/bitcoiinBT2/go-bitcoiin/rpc"
+	"github.com/bitcoiinBT2/go-bitcoiin/swarm"
 )
 
 func init() {

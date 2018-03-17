@@ -33,7 +33,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/swarm/api"
+	"github.com/bitcoiinBT2/go-bitcoiin/swarm/api"
 )
 
 var (
