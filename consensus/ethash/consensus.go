@@ -36,8 +36,8 @@ import (
 
 // Ethash proof-of-work protocol constants.
 var (
-	FrontierBlockReward    *big.Int = big.NewInt(5e+18) // Block reward in wei for successfully mining a block
-	ByzantiumBlockReward   *big.Int = big.NewInt(3e+18) // Block reward in wei for successfully mining a block upward from Byzantium
+	FrontierBlockReward    *big.Int = big.NewInt(5e+18) // Block reward in gen for successfully mining a block
+	ByzantiumBlockReward   *big.Int = big.NewInt(3e+18) // Block reward in gen for successfully mining a block upward from Byzantium
 	maxUncles                       = 2                 // Maximum number of uncles allowed in a single block
 	allowedFutureBlockTime          = 15 * time.Second  // Max time from current time allowed for blocks, before they're considered future blocks
 )
@@ -295,13 +295,13 @@ func (ethash *Ethash) CalcDifficulty(chain consensus.ChainReader, time uint64, p
 // the difficulty that a new block should have when created at time
 // given the parent block's time and difficulty.
 func CalcDifficulty(config *params.ChainConfig, time uint64, parent *types.Header) *big.Int {
-	return big.NewInt(1)
+	// return big.NewInt(1)
 	// next := new(big.Int).Add(parent.Number, big1)
 	// switch {
 	// case config.IsByzantium(next):
 	// 	return calcDifficultyByzantium(time, parent)
 	// case config.IsHomestead(next):
-	// 	return calcDifficultyHomestead(time, parent)
+		return calcDifficultyHomestead(time, parent)
 	// default:
 	// 	return calcDifficultyFrontier(time, parent)
 	// }

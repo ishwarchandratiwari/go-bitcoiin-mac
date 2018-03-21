@@ -1762,10 +1762,10 @@ if (typeof XMLHttpRequest === 'undefined') {
 var BigNumber = require('bignumber.js');
 
 var ETH_UNITS = [
-    'wei',
-    'kwei',
-    'Mwei',
-    'Gwei',
+    'gen',
+    'kgen',
+    'Mgen',
+    'Ggen',
     'szabo',
     'finney',
     'femtobitcoiin',
@@ -1885,17 +1885,17 @@ var utf8 = require('utf8');
 
 var unitMap = {
     'nobitcoiin':      '0',
-    'wei':          '1',
-    'kwei':         '1000',
-    'Kwei':         '1000',
+    'gen':          '1',
+    'kgen':         '1000',
+    'Kgen':         '1000',
     'babbage':      '1000',
     'femtobitcoiin':   '1000',
-    'mwei':         '1000000',
-    'Mwei':         '1000000',
+    'mgen':         '1000000',
+    'Mgen':         '1000000',
     'lovelace':     '1000000',
     'picobitcoiin':    '1000000',
-    'gwei':         '1000000000',
-    'Gwei':         '1000000000',
+    'ggen':         '1000000000',
+    'Ggen':         '1000000000',
     'shannon':      '1000000000',
     'nanobitcoiin':    '1000000000',
     'nano':         '1000000000',
@@ -2132,19 +2132,19 @@ var getValueOfUnit = function (unit) {
     unit = unit ? unit.toLowerCase() : 'bitcoiin';
     var unitValue = unitMap[unit];
     if (unitValue === undefined) {
-        throw new Error('This unit doesn\'t exists, please use the one of the following units' + JSON.stringify(unitMap, null, 2));
+        throw new Error('This unit doesn\'t exists, please use the nnnnnnnnnn one of the following units' + JSON.stringify(unitMap, null, 2));
     }
     return new BigNumber(unitValue, 10);
 };
 
 /**
- * Takes a number of wei and converts it to any other bitcoiin unit.
+ * Takes a number of gen and converts it to any other bitcoiin unit.
  *
  * Possible units are:
  *   SI Short   SI Full        Effigy       Other
- * - kwei       femtobitcoiin     babbage
- * - mwei       picobitcoiin      lovelace
- * - gwei       nanobitcoiin      shannon      nano
+ * - kgen       femtobitcoiin     babbage
+ * - mgen       picobitcoiin      lovelace
+ * - ggen       nanobitcoiin      shannon      nano
  * - --         microbitcoiin     szabo        micro
  * - --         millibitcoiin     finney       milli
  * - bitcoiin      --             --
@@ -2165,13 +2165,13 @@ var fromWei = function(number, unit) {
 };
 
 /**
- * Takes a number of a unit and converts it to wei.
+ * Takes a number of a unit and converts it to gen.
  *
  * Possible units are:
  *   SI Short   SI Full        Effigy       Other
- * - kwei       femtobitcoiin     babbage
- * - mwei       picobitcoiin      lovelace
- * - gwei       nanobitcoiin      shannon      nano
+ * - kgen       femtobitcoiin     babbage
+ * - mgen       picobitcoiin      lovelace
+ * - ggen       nanobitcoiin      shannon      nano
  * - --         microbitcoiin     szabo        micro
  * - --         microbitcoiin     szabo        micro
  * - --         millibitcoiin     finney       milli

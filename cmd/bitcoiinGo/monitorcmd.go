@@ -269,7 +269,7 @@ func refreshCharts(client *rpc.Client, metrics []string, data [][]float64, units
 }
 
 // updateChart inserts a dataset into a line chart, scaling appropriately as to
-// not display weird labels, also updating the chart label accordingly.
+// not display genrd labels, also updating the chart label accordingly.
 func updateChart(metric string, data []float64, base *int, chart *termui.LineChart, err error) (realign bool) {
 	dataUnits := []string{"", "K", "M", "G", "T", "E"}
 	timeUnits := []string{"ns", "µs", "ms", "s", "ks", "ms"}

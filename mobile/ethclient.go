@@ -148,7 +148,7 @@ func (ec *Bitcoiin2gClient) SubscribeNewHead(ctx *Context, handler NewHeadHandle
 
 // State Access
 
-// GetBalanceAt returns the wei balance of the given account.
+// GetBalanceAt returns the gen balance of the given account.
 // The block number can be <0, in which case the balance is taken from the latest known block.
 func (ec *Bitcoiin2gClient) GetBalanceAt(ctx *Context, account *Address, number int64) (balance *BigInt, _ error) {
 	if number < 0 {
@@ -237,7 +237,7 @@ func (ec *Bitcoiin2gClient) SubscribeFilterLogs(ctx *Context, query *FilterQuery
 
 // Pending State
 
-// GetPendingBalanceAt returns the wei balance of the given account in the pending state.
+// GetPendingBalanceAt returns the gen balance of the given account in the pending state.
 func (ec *Bitcoiin2gClient) GetPendingBalanceAt(ctx *Context, account *Address) (balance *BigInt, _ error) {
 	rawBalance, err := ec.client.PendingBalanceAt(ctx.context, account.address)
 	return &BigInt{rawBalance}, err

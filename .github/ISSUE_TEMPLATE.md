@@ -6,7 +6,7 @@ For general questions please use the gitter channel or the Bitcoiin2g stack exch
 
 #### System information
 
-Geth version: `geth version`
+BitcoiinGo version: `geth version`
 OS & Version: Windows/Linux/OSX
 Commit hash : (if `develop`)
 

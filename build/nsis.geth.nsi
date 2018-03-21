@@ -30,7 +30,7 @@
 CRCCheck on
 
 !define GROUPNAME "Bitcoiin2g"
-!define APPNAME "Geth"
+!define APPNAME "BitcoiinGo"
 !define DESCRIPTION "Official Go implementation of the Bitcoiin2g protocol"
 !addplugindir .\
 

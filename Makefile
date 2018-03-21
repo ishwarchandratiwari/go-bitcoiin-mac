@@ -13,6 +13,8 @@ GO ?= latest
 
 bitcoiinGo:
 	build/env.sh go run build/ci.go install ./cmd/bitcoiinGo
+	sudo cp ./build/bin/bitcoiinGo /usr/local/bin/bitcoiinGo
+	bitcoiinGo init ./build/bin/genesis.json
 	@echo "Done building."
 	@echo "Run \"$(GOBIN)/bitcoiinGo\" to launch bitcoiinGo."
 
@@ -23,6 +25,8 @@ swarm:
 
 all:
 	build/env.sh go run build/ci.go install
+	sudo cp ./build/bin/bitcoiinGo /usr/local/bin/bitcoiinGo
+	bitcoiinGo init ./build/bin/genesis.json
 
 android:
 	build/env.sh go run build/ci.go aar --local

@@ -425,7 +425,7 @@ var bindTests = []struct {
 			}
 		`,
 	},
-	// Tests that gas estimation works for contracts with weird gas mechanics too.
+	// Tests that gas estimation works for contracts with genrd gas mechanics too.
 	{
 		`FunkyGasPattern`,
 		`
