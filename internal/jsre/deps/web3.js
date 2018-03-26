@@ -2121,11 +2121,11 @@ var toHex = function (val) {
 };
 
 /**
- * Returns value of unit in Wei
+ * Returns value of unit in Gen
  *
  * @method getValueOfUnit
  * @param {String} unit the unit to convert to, default bitcoiin
- * @returns {BigNumber} value of the unit (in Wei)
+ * @returns {BigNumber} value of the unit (in Gen)
  * @throws error if the unit is not correct:w
  */
 var getValueOfUnit = function (unit) {
@@ -2153,12 +2153,12 @@ var getValueOfUnit = function (unit) {
  * - gbitcoiin
  * - tbitcoiin
  *
- * @method fromWei
+ * @method fromGen
  * @param {Number|String} number can be a number, number string or a HEX of a decimal
  * @param {String} unit the unit to convert to, default bitcoiin
  * @return {String|Object} When given a BigNumber object it returns one as well, otherwise a number
 */
-var fromWei = function(number, unit) {
+var fromGen = function(number, unit) {
     var returnValue = toBigNumber(number).dividedBy(getValueOfUnit(unit));
 
     return isBigNumber(number) ? returnValue : returnValue.toString(10);
@@ -2181,12 +2181,12 @@ var fromWei = function(number, unit) {
  * - gbitcoiin
  * - tbitcoiin
  *
- * @method toWei
+ * @method toGen
  * @param {Number|String|BigNumber} number can be a number, number string or a HEX of a decimal
  * @param {String} unit the unit to convert from, default bitcoiin
  * @return {String|Object} When given a BigNumber object it returns one as well, otherwise a number
 */
-var toWei = function(number, unit) {
+var toGen = function(number, unit) {
     var returnValue = toBigNumber(number).times(getValueOfUnit(unit));
 
     return isBigNumber(number) ? returnValue : returnValue.toString(10);
@@ -2453,8 +2453,8 @@ module.exports = {
     transformToFullName: transformToFullName,
     extractDisplayName: extractDisplayName,
     extractTypeName: extractTypeName,
-    toWei: toWei,
-    fromWei: fromWei,
+    toGen: toGen,
+    fromGen: fromGen,
     toBigNumber: toBigNumber,
     toTwosComplement: toTwosComplement,
     toAddress: toAddress,
@@ -2575,8 +2575,8 @@ Web3.prototype.fromUtf8 = utils.fromUtf8;
 Web3.prototype.toDecimal = utils.toDecimal;
 Web3.prototype.fromDecimal = utils.fromDecimal;
 Web3.prototype.toBigNumber = utils.toBigNumber;
-Web3.prototype.toWei = utils.toWei;
-Web3.prototype.fromWei = utils.fromWei;
+Web3.prototype.toGen = utils.toGen;
+Web3.prototype.fromGen = utils.fromGen;
 Web3.prototype.isAddress = utils.isAddress;
 Web3.prototype.isChecksumAddress = utils.isChecksumAddress;
 Web3.prototype.toChecksumAddress = utils.toChecksumAddress;
