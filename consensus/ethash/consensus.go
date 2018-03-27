@@ -39,7 +39,7 @@ var (
 	FrontierBlockReward    *big.Int = big.NewInt(5e+18) // Block reward in gen for successfully mining a block
 	ByzantiumBlockReward   *big.Int = big.NewInt(3e+18) // Block reward in gen for successfully mining a block upward from Byzantium
 	zeroBlockReward		   *big.Int = big.NewInt(0e+18)
-	maxRewardableBlock 	   *big.Int = big.NewInt(10)
+	maxRewardableBlock 	   *big.Int = big.NewInt(66666666)
 	maxUncles                       = 2                 // Maximum number of uncles allowed in a single block
 	allowedFutureBlockTime          = 15 * time.Second  // Max time from current time allowed for blocks, before they're considered future blocks
 )
