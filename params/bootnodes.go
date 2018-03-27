@@ -20,8 +20,7 @@ package params
 // the main Bitcoiin2g network.
 var MainnetBootnodes = []string{
 	// Bitcoiin2g Foundation Go Bootnodes
-	"enode://5eefd07b2935f4e743950c2861ea1e46005635993e770cad1a40cd39254beb18acfe3d87887aa216701622710ada55d48c50920db91c5c6c93ba56ea75cea2b0@13.126.229.165:30303", // IE
-
+	"enode://27d9afd723eede5218bdd5c8d4a6bd6ddf5eff6044f30f1ca093ceee01707a5eb8ad083ed2585f3c747dcde080b465f5978e3a9364246d31cd47185f27f11516@37.48.80.174:30303", // IE
 }
 
 // TestnetBootnodes are the enode URLs of the P2P bootstrap nodes running on the
