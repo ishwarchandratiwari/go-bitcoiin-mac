@@ -24,7 +24,6 @@ build/_vendor/pkg
 
 # used by the Makefile
 /build/_workspace/
-/build/bin/
 /geth*.zip
 
 # travis
