@@ -117,7 +117,8 @@ func New(ctx *node.ServiceContext, config *Config) (*Bitcoiin2g, error) {
 	if _, ok := genesisErr.(*params.ConfigCompatError); genesisErr != nil && !ok {
 		return nil, genesisErr
 	}
-	log.Info("Initialised chain configuration", "config", chainConfig)
+	// log.Info("Initialised chain configuration", "config", chainConfig)
+	
 
 	eth := &Bitcoiin2g{
 		config:         config,

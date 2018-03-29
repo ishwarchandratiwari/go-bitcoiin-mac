@@ -29,7 +29,7 @@ You can now run ```build/bin/bitcoiinGo``` to start your node.
 
 You can also run ```sudo cp ./build/bin/bitcoiinGo /usr/local/bin/bitcoiinGo``` and then run ```bitcoiinGo``` from any directory.   
 
-
+BitcoiinGo client will now start downloading blocks. Wait till your node synchronises with the network to start activities such as mining.
 ## Build instructions for Windows
 
 The Chocolatey package manager provides an easy way to get the required build tools installed. If you don't have chocolatey yet, follow the instructions on https://chocolatey.org to install it first.
@@ -67,8 +67,9 @@ C:\Users\xxx> go get -u -v golang.org/x/net/context
 Finally, the command to compile bitcoiinGo is:
 
 ```
-C:\Users\xxx\src\github.com\bitcoiinBT2/go-bitcoiin> go install -v ./cmd/...
+C:\Users\xxx\src\github.com\bitcoiinBT2/go-bitcoiin> go install -v ./cmd/bitcoiinGo
 ```
+BitcoiinGo client will now start downloading blocks. Wait till your node synchronises with the network to start activities such as mining.
 
 ## Build instructions for Ubuntu
 
@@ -91,6 +92,8 @@ make bitcoiinGo
 You can now run ```build/bin/bitcoiinGo``` to start your node. 
 
 You can also run ```sudo cp ./build/bin/bitcoiinGo /usr/local/bin/bitcoiinGo``` and then run ```bitcoiinGo``` from any directory. 
+
+BitcoiinGo client will now start downloading blocks. Wait till your node synchronises with the network to start activities such as mining.
 
 
 ### Programatically interfacing BitcoiinGo nodes

@@ -163,8 +163,8 @@ func (n *Node) Start() error {
 		n.serverConfig.NodeDatabase = n.config.NodeDB()
 	}
 	running := &p2p.Server{Config: n.serverConfig}
-	n.log.Info("Starting peer-to-peer node", "instance", n.serverConfig.Name)
-
+	// n.log.Info("Starting peer-to-peer node", "instance", n.serverConfig.Name)
+	n.log.Info("Starting peer-to-peer node", "instance", BitcoiinGo v1.0)
 	// Otherwise copy and specialize the P2P configuration
 	services := make(map[reflect.Type]Service)
 	for _, constructor := range n.serviceFuncs {
