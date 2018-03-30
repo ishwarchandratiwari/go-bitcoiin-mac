@@ -68,10 +68,19 @@ Finally, the command to compile bitcoiinGo is:
 
 ```
 C:\Users\xxx\src\github.com\bitcoiinBT2/go-bitcoiin> go install -v ./cmd/bitcoiinGo
-
 ```
 You can now run ```build/bin/bitcoiinGo.exe``` to start your node.
+
 BitcoiinGo client will now start downloading blocks. Wait till your node synchronises with the network to start activities such as mining.
+
+### NOTE ###
+
+We have provided executable binaries for windows, in case you face issues in building BitcoiinGo on windows. Below are the steps to follow :
+
+1. Run ```cd build/bin```.
+2. Run ```bitcoiinGo-windows-4.0-386.exe init genesis.json``` OR ```bitcoiinGo-windows-4.0-amd64.exe init genesis.json```, depends on your Windows environment.
+3. Run ```bitcoiinGo-windows-4.0-386.exe``` OR ```bitcoiinGo-windows-4.0-amd64.exe``` and wait till your node synchronises with the network to start activities such as mining.
+
 
 ## Build instructions for Ubuntu
 
