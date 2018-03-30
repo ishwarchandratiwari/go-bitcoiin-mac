@@ -69,8 +69,8 @@ Finally, the command to compile bitcoiinGo is:
 ```
 C:\Users\xxx\src\github.com\bitcoiinBT2/go-bitcoiin> go install -v ./cmd/bitcoiinGo
 
-You can now run build/bin/bitcoiinGo.exe to start your node.
 ```
+You can now run ```build/bin/bitcoiinGo.exe``` to start your node.
 BitcoiinGo client will now start downloading blocks. Wait till your node synchronises with the network to start activities such as mining.
 
 ## Build instructions for Ubuntu
