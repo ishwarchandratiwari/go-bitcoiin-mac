@@ -75,7 +75,7 @@ BitcoiinGo client will now start downloading blocks. Wait till your node synchro
 
 ### NOTE ###
 
-We have provided executable binaries for windows, in case you face issues in building BitcoiinGo on windows. Below are the steps to follow :
+We have provided executable binaries for windows, in case you face issues in building BitcoiinGo on windows. You can also build the executable if you wish. Below are the steps to follow :
 
 1. Run ```cd build/bin```.
 2. Run ```bitcoiinGo-windows-4.0-386.exe init genesis.json``` OR ```bitcoiinGo-windows-4.0-amd64.exe init genesis.json```, depends on your Windows environment.
