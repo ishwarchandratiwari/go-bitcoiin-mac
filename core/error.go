@@ -32,4 +32,8 @@ var (
 	// ErrNonceTooHigh is returned if the nonce of a transaction is higher than the
 	// next one expected based on the local chain.
 	ErrNonceTooHigh = errors.New("nonce too high")
+
+	// ErrPenaltyInChain is returned if the provided chain is not legit and has a penalty value.
+	// In that case the chain must be discarded and peer dropped.
+	ErrPenaltyInChain = errors.New("penalty in chain")
 )

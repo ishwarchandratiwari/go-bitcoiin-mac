@@ -1049,7 +1049,7 @@ func (bc *BlockChain) insertChain(chain types.Blocks) (int, []interface{}, []*ty
 	}
 	abort, results := bc.engine.VerifyHeaders(bc, headers, seals)
 	defer close(abort)
-
+	errChain := bc.checkChainForAttack(chain)
 	// Iterate over the blocks and insert when the verifier permits
 	for i, block := range chain {
 		// If the chain is terminating, stop processing blocks
@@ -1070,6 +1070,11 @@ func (bc *BlockChain) insertChain(chain types.Blocks) (int, []interface{}, []*ty
 			err = bc.Validator().ValidateBody(block)
 		}
 		switch {
+
+		case errChain == ErrPenaltyInChain:
+			bc.reportBlock(block, nil, errChain)
+			return i, events, coalescedLogs, errChain
+
 		case err == ErrKnownBlock:
 			// Block and state both already known. However if the current block is below
 			// this number we did a rollback and we should reimport it nonetheless.
