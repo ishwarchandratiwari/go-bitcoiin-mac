@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/bitcoiinBT2/go-bitcoiin/core/types"
 	"github.com/bitcoiinBT2/go-bitcoiin/log"
-	"github.com/bitcoiinBT2/go-bitcoiin/params"
+	"git.pirl.io/0x1337coding/go-bitcoiin/params"
 	"sort"
 )
 
@@ -73,7 +73,7 @@ func (bc *BlockChain) checkChainForAttack(blocks types.Blocks) error {
 	}
 	//fmt.Println("Penalty value for the chain :", penalty)
 	context := []interface{}{
-		"synced", syncStatus, "number", tipOfTheMainChain, "incoming_number", blocks[0].NumberU64() - 1, "penalty", penalty ,"implementation", "The Pirl Team",
+		"synced", syncStatus, "number", tipOfTheMainChain, "incoming_number", blocks[0].NumberU64() - 1, "penalty", penalty ,"implementation", "The Pirl Team ---> https://pirl.io ",
 	}
 
 	log.Info("checking legitimity of the chain", context... )

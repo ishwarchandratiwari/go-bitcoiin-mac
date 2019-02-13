@@ -84,7 +84,7 @@ var (
 	GenesisDifficulty      = big.NewInt(131072) // Difficulty of the Genesis block.
 	MinimumDifficulty      = big.NewInt(131072) // The minimum that the difficulty may ever be.
 	DurationLimit          = big.NewInt(13)     // The decision boundary on the blocktime duration used to determine whether difficulty should go up or not.
-	ActivationBlock  		= int64(2442442)
-	PenatlyCheckLenght 	 	= uint64(20)
+	ActivationBlock  		= int64(2442442)  // This should be set to the forking block number of choice
+	PenatlyCheckLenght 	 	= uint64(120)
 
 )
