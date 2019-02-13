@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/bitcoiinBT2/go-bitcoiin/core/types"
 	"github.com/bitcoiinBT2/go-bitcoiin/log"
-	"git.pirl.io/0x1337coding/go-bitcoiin/params"
+	"github.com/bitcoiinBT2/go-bitcoiin/params"
 	"sort"
 )
 
