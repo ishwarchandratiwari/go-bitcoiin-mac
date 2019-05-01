@@ -10,11 +10,11 @@ fi
 # Create fake Go workspace if it doesn't exist yet.
 workspace="$PWD/build/_workspace"
 root="$PWD"
-ethdir="$workspace/src/git.pirl.io/community"
-if [ ! -L "$ethdir/pirl" ]; then
-    mkdir -p "$ethdir"
-    cd "$ethdir"
-    ln -s ../../../../../. pirl
+bitcoiindir="$workspace/src/git.pirl.io/bitcoiin"
+if [ ! -L "$bitcoiindir/go-bitcoiin" ]; then
+    mkdir -p "$bitcoiindir"
+    cd "$bitcoiindir"
+    ln -s ../../../../../. go-bitcoiin
     cd "$root"
 fi
 
@@ -23,8 +23,8 @@ GOPATH="$workspace"
 export GOPATH
 
 # Run the command inside the workspace.
-cd "$ethdir/pirl"
-PWD="$ethdir/pirl"
+cd "$bitcoiindir/go-bitcoiin"
+PWD="$bitcoiindir/go-bitcoiin"
 
 # Launch the arguments with the configured environment.
 exec "$@"
