@@ -19,7 +19,6 @@ package ethash
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
@@ -36,7 +35,6 @@ import (
 	"git.pirl.io/bitcoiin/go-bitcoiin/params"
 	"git.pirl.io/bitcoiin/go-bitcoiin/rlp"
 	"golang.org/x/crypto/sha3"
-	EthLog "git.pirl.io/bitcoiin/go-bitcoiin/log"
 )
 
 // Ethash proof-of-work protocol constants.
@@ -395,26 +393,7 @@ var (
 	big2999999hulk    = big.NewInt(29999999)
 )
 
-func calcDifficultyPirl(time uint64, parent *types.Header) *big.Int {
-	diff := new(big.Int)
-	adjust := new(big.Int).Div(parent.Difficulty, big10)
-	bigTime := new(big.Int)
-	bigParentTime := new(big.Int)
 
-	bigTime.SetUint64(time)
-	i := new(big.Int).SetUint64(parent.Time)
-	bigParentTime.Set(i)
-	if bigTime.Sub(bigTime, bigParentTime).Cmp(params.DurationLimit) < 0 {
-		diff.Add(parent.Difficulty, adjust)
-	} else {
-		diff.Sub(parent.Difficulty, adjust)
-	}
-	if diff.Cmp(params.MinimumDifficulty) < 0 {
-		diff.Set(params.MinimumDifficulty)
-	}
-	//fmt.Println(diff)
-	return diff
-}
 
 // makeDifficultyCalculator creates a difficultyCalculator with the given bomb-delay.
 // the difficulty is calculated with Byzantium rules, which differs from Homestead in
@@ -490,7 +469,7 @@ func calcDifficultyHomestead(time uint64, parent *types.Header) *big.Int {
 	//        ) + 2^(periodCount - 2)
 
 	bigTime := new(big.Int).SetUint64(time)
-	bigParentTime := new(big.Int).Set(parent.Time)
+	bigParentTime := new(big.Int).SetUint64(parent.Time)
 
 	// holds intermediate values to make the algo easier to read & audit
 	x := new(big.Int)
