@@ -34,7 +34,7 @@ var (
 // TrustedCheckpoints associates each known checkpoint with the genesis hash of
 // the chain it belongs to.
 var TrustedCheckpoints = map[common.Hash]*TrustedCheckpoint{
-	//MainnetGenesisHash: MainnetTrustedCheckpoint,
+	MainnetGenesisHash: MainnetTrustedCheckpoint,
 	//TestnetGenesisHash: TestnetTrustedCheckpoint,
 	//RinkebyGenesisHash: RinkebyTrustedCheckpoint,
 	//GoerliGenesisHash:  GoerliTrustedCheckpoint,
@@ -60,10 +60,10 @@ var (
 	// MainnetTrustedCheckpoint contains the light client trusted checkpoint for the main network.
 	MainnetTrustedCheckpoint = &TrustedCheckpoint{
 		Name:         "mainnet",
-		SectionIndex: 109,
-		SectionHead:  common.HexToHash("0x141eb43969fbec5007ab6ee0189a14e39cb7a6d5b36c4b206fd4e489d9a03ec1"),
-		CHTRoot:      common.HexToHash("0x91e52e6648fd5c3252a07e8d65b600c6a971ccce982ca6706a464e6e59a719dd"),
-		BloomRoot:    common.HexToHash("0x0b18c049f44ec715e322ffe642b8e972393353b926cc6ab4652457d06b32fe8d"),
+		SectionIndex: 73,
+		SectionHead:  common.HexToHash("0x96bd1032049631ee0c575a45078d930375b0a03422e049589c756a2fe4d560e2"),
+		CHTRoot:      common.HexToHash("0xd46d5bea788e4baa255f7177b8a7d54f4079d07e223817c009d9a19e6b17c5b4"),
+		BloomRoot:    common.HexToHash("0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"),
 	}
 
 	// TestnetChainConfig contains the chain parameters to run a node on the Ropsten test network.
