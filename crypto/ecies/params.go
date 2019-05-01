@@ -42,7 +42,7 @@ import (
 	"fmt"
 	"hash"
 
-	ethcrypto "github.com/bitcoiinBT2/go-bitcoiin/crypto"
+	ethcrypto "git.pirl.io/bitcoiin/go-bitcoiin/crypto"
 )
 
 var (

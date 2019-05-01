@@ -1,18 +1,18 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package build
 
@@ -58,15 +58,6 @@ func GOPATH() string {
 		log.Fatal("GOPATH is not set")
 	}
 	return os.Getenv("GOPATH")
-}
-
-// VERSION returns the content of the VERSION file.
-func VERSION() string {
-	version, err := ioutil.ReadFile("VERSION")
-	if err != nil {
-		log.Fatal(err)
-	}
-	return string(bytes.TrimSpace(version))
 }
 
 var warnedAboutGit bool
@@ -152,9 +143,9 @@ func CopyFile(dst, src string, mode os.FileMode) {
 // so that go commands executed by build use the same version of Go as the 'host' that runs
 // build code. e.g.
 //
-//     /usr/lib/go-1.8/bin/go run build/ci.go ...
+//     /usr/lib/go-1.11/bin/go run build/ci.go ...
 //
-// runs using go 1.8 and invokes go 1.8 tools from the same GOROOT. This is also important
+// runs using go 1.11 and invokes go 1.11 tools from the same GOROOT. This is also important
 // because runtime.Version checks on the host should match the tools that are run.
 func GoTool(tool string, args ...string) *exec.Cmd {
 	args = append([]string{tool}, args...)
@@ -185,4 +176,35 @@ func ExpandPackagesNoVendor(patterns []string) []string {
 		return packages
 	}
 	return patterns
+}
+
+// UploadSFTP uploads files to a remote host using the sftp command line tool.
+// The destination host may be specified either as [user@]host[: or as a URI in
+// the form sftp://[user@]host[:port].
+func UploadSFTP(identityFile, host, dir string, files []string) error {
+	sftp := exec.Command("sftp")
+	sftp.Stdout = nil
+	sftp.Stderr = os.Stderr
+	if identityFile != "" {
+		sftp.Args = append(sftp.Args, "-i", identityFile)
+	}
+	sftp.Args = append(sftp.Args, host)
+	fmt.Println(">>>", strings.Join(sftp.Args, " "))
+	if *DryRunFlag {
+		return nil
+	}
+
+	stdin, err := sftp.StdinPipe()
+	if err != nil {
+		return fmt.Errorf("can't create stdin pipe for sftp: %v", err)
+	}
+	if err := sftp.Start(); err != nil {
+		return err
+	}
+	in := io.MultiWriter(stdin, os.Stdout)
+	for _, f := range files {
+		fmt.Fprintln(in, "put", f, path.Join(dir, filepath.Base(f)))
+	}
+	stdin.Close()
+	return sftp.Wait()
 }

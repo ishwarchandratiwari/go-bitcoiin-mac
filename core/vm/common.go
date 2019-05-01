@@ -19,8 +19,8 @@ package vm
 import (
 	"math/big"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/common/math"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common/math"
 )
 
 // calculates the memory size required for a step

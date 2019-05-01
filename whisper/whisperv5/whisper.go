@@ -1,18 +1,18 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package whisperv5
 
@@ -26,15 +26,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/crypto"
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p"
-	"github.com/bitcoiinBT2/go-bitcoiin/rpc"
+	mapset "github.com/deckarep/golang-set"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/crypto"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p"
+	"git.pirl.io/bitcoiin/go-bitcoiin/rpc"
 	"github.com/syndtr/goleveldb/leveldb/errors"
 	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/sync/syncmap"
-	set "gopkg.in/fatih/set.v0"
 )
 
 type Statistics struct {
@@ -51,7 +51,7 @@ const (
 	overflowIdx   = iota // Indicator of message queue overflow
 )
 
-// Whisper represents a dark communication interface through the Bitcoiin2g
+// Whisper represents a dark communication interface through the Ethereum
 // network, using its very own P2P communication layer.
 type Whisper struct {
 	protocol p2p.Protocol // Protocol description and parameters
@@ -63,7 +63,7 @@ type Whisper struct {
 
 	poolMu      sync.RWMutex              // Mutex to sync the message and expiration pools
 	envelopes   map[common.Hash]*Envelope // Pool of envelopes currently tracked by this node
-	expirations map[uint32]*set.SetNonTS  // Message expiration pool
+	expirations map[uint32]mapset.Set     // Message expiration pool
 
 	peerMu sync.RWMutex       // Mutex to sync the active peer set
 	peers  map[*Peer]struct{} // Set of currently active peers
@@ -80,7 +80,7 @@ type Whisper struct {
 	mailServer MailServer // MailServer interface
 }
 
-// New creates a Whisper client ready to communicate through the Bitcoiin2g P2P network.
+// New creates a Whisper client ready to communicate through the Ethereum P2P network.
 func New(cfg *Config) *Whisper {
 	if cfg == nil {
 		cfg = &DefaultConfig
@@ -90,7 +90,7 @@ func New(cfg *Config) *Whisper {
 		privateKeys:  make(map[string]*ecdsa.PrivateKey),
 		symKeys:      make(map[string][]byte),
 		envelopes:    make(map[common.Hash]*Envelope),
-		expirations:  make(map[uint32]*set.SetNonTS),
+		expirations:  make(map[uint32]mapset.Set),
 		peers:        make(map[*Peer]struct{}),
 		messageQueue: make(chan *Envelope, messageQueueLimit),
 		p2pMsgQueue:  make(chan *Envelope, messageQueueLimit),
@@ -291,7 +291,7 @@ func (w *Whisper) AddKeyPair(key *ecdsa.PrivateKey) (string, error) {
 	return id, nil
 }
 
-// HasKeyPair checks if the the whisper node is configured with the private key
+// HasKeyPair checks if the whisper node is configured with the private key
 // of the specified public pair.
 func (w *Whisper) HasKeyPair(id string) bool {
 	w.keyMu.RLock()
@@ -469,18 +469,18 @@ func (w *Whisper) Stop() error {
 
 // HandlePeer is called by the underlying P2P layer when the whisper sub-protocol
 // connection is negotiated.
-func (wh *Whisper) HandlePeer(peer *p2p.Peer, rw p2p.MsgReadWriter) error {
+func (w *Whisper) HandlePeer(peer *p2p.Peer, rw p2p.MsgReadWriter) error {
 	// Create the new peer and start tracking it
-	whisperPeer := newPeer(wh, peer, rw)
+	whisperPeer := newPeer(w, peer, rw)
 
-	wh.peerMu.Lock()
-	wh.peers[whisperPeer] = struct{}{}
-	wh.peerMu.Unlock()
+	w.peerMu.Lock()
+	w.peers[whisperPeer] = struct{}{}
+	w.peerMu.Unlock()
 
 	defer func() {
-		wh.peerMu.Lock()
-		delete(wh.peers, whisperPeer)
-		wh.peerMu.Unlock()
+		w.peerMu.Lock()
+		delete(w.peers, whisperPeer)
+		w.peerMu.Unlock()
 	}()
 
 	// Run the peer handshake and state updates
@@ -490,19 +490,19 @@ func (wh *Whisper) HandlePeer(peer *p2p.Peer, rw p2p.MsgReadWriter) error {
 	whisperPeer.start()
 	defer whisperPeer.stop()
 
-	return wh.runMessageLoop(whisperPeer, rw)
+	return w.runMessageLoop(whisperPeer, rw)
 }
 
 // runMessageLoop reads and processes inbound messages directly to merge into client-global state.
-func (wh *Whisper) runMessageLoop(p *Peer, rw p2p.MsgReadWriter) error {
+func (w *Whisper) runMessageLoop(p *Peer, rw p2p.MsgReadWriter) error {
 	for {
 		// fetch the next packet
 		packet, err := rw.ReadMsg()
 		if err != nil {
-			log.Warn("message loop", "peer", p.peer.ID(), "err", err)
+			log.Info("message loop", "peer", p.peer.ID(), "err", err)
 			return err
 		}
-		if packet.Size > wh.MaxMessageSize() {
+		if packet.Size > w.MaxMessageSize() {
 			log.Warn("oversized message received", "peer", p.peer.ID())
 			return errors.New("oversized message received")
 		}
@@ -518,7 +518,7 @@ func (wh *Whisper) runMessageLoop(p *Peer, rw p2p.MsgReadWriter) error {
 				log.Warn("failed to decode envelope, peer will be disconnected", "peer", p.peer.ID(), "err", err)
 				return errors.New("invalid envelope")
 			}
-			cached, err := wh.add(&envelope)
+			cached, err := w.add(&envelope)
 			if err != nil {
 				log.Warn("bad envelope received, peer will be disconnected", "peer", p.peer.ID(), "err", err)
 				return errors.New("invalid envelope")
@@ -537,17 +537,17 @@ func (wh *Whisper) runMessageLoop(p *Peer, rw p2p.MsgReadWriter) error {
 					log.Warn("failed to decode direct message, peer will be disconnected", "peer", p.peer.ID(), "err", err)
 					return errors.New("invalid direct message")
 				}
-				wh.postEvent(&envelope, true)
+				w.postEvent(&envelope, true)
 			}
 		case p2pRequestCode:
 			// Must be processed if mail server is implemented. Otherwise ignore.
-			if wh.mailServer != nil {
+			if w.mailServer != nil {
 				var request Envelope
 				if err := packet.Decode(&request); err != nil {
 					log.Warn("failed to decode p2p request message, peer will be disconnected", "peer", p.peer.ID(), "err", err)
 					return errors.New("invalid p2p request")
 				}
-				wh.mailServer.DeliverMail(p, &request)
+				w.mailServer.DeliverMail(p, &request)
 			}
 		default:
 			// New message types might be implemented in the future versions of Whisper.
@@ -561,29 +561,27 @@ func (wh *Whisper) runMessageLoop(p *Peer, rw p2p.MsgReadWriter) error {
 // add inserts a new envelope into the message pool to be distributed within the
 // whisper network. It also inserts the envelope into the expiration pool at the
 // appropriate time-stamp. In case of error, connection should be dropped.
-func (wh *Whisper) add(envelope *Envelope) (bool, error) {
+func (w *Whisper) add(envelope *Envelope) (bool, error) {
 	now := uint32(time.Now().Unix())
 	sent := envelope.Expiry - envelope.TTL
 
 	if sent > now {
 		if sent-SynchAllowance > now {
 			return false, fmt.Errorf("envelope created in the future [%x]", envelope.Hash())
-		} else {
-			// recalculate PoW, adjusted for the time difference, plus one second for latency
-			envelope.calculatePoW(sent - now + 1)
 		}
+		// recalculate PoW, adjusted for the time difference, plus one second for latency
+		envelope.calculatePoW(sent - now + 1)
 	}
 
 	if envelope.Expiry < now {
 		if envelope.Expiry+SynchAllowance*2 < now {
 			return false, fmt.Errorf("very old message")
-		} else {
-			log.Debug("expired envelope dropped", "hash", envelope.Hash().Hex())
-			return false, nil // drop envelope without error
 		}
+		log.Debug("expired envelope dropped", "hash", envelope.Hash().Hex())
+		return false, nil // drop envelope without error
 	}
 
-	if uint32(envelope.size()) > wh.MaxMessageSize() {
+	if uint32(envelope.size()) > w.MaxMessageSize() {
 		return false, fmt.Errorf("huge messages are not allowed [%x]", envelope.Hash())
 	}
 
@@ -598,36 +596,36 @@ func (wh *Whisper) add(envelope *Envelope) (bool, error) {
 		return false, fmt.Errorf("wrong size of AESNonce: %d bytes [env: %x]", aesNonceSize, envelope.Hash())
 	}
 
-	if envelope.PoW() < wh.MinPow() {
+	if envelope.PoW() < w.MinPow() {
 		log.Debug("envelope with low PoW dropped", "PoW", envelope.PoW(), "hash", envelope.Hash().Hex())
 		return false, nil // drop envelope without error
 	}
 
 	hash := envelope.Hash()
 
-	wh.poolMu.Lock()
-	_, alreadyCached := wh.envelopes[hash]
+	w.poolMu.Lock()
+	_, alreadyCached := w.envelopes[hash]
 	if !alreadyCached {
-		wh.envelopes[hash] = envelope
-		if wh.expirations[envelope.Expiry] == nil {
-			wh.expirations[envelope.Expiry] = set.NewNonTS()
+		w.envelopes[hash] = envelope
+		if w.expirations[envelope.Expiry] == nil {
+			w.expirations[envelope.Expiry] = mapset.NewThreadUnsafeSet()
 		}
-		if !wh.expirations[envelope.Expiry].Has(hash) {
-			wh.expirations[envelope.Expiry].Add(hash)
+		if !w.expirations[envelope.Expiry].Contains(hash) {
+			w.expirations[envelope.Expiry].Add(hash)
 		}
 	}
-	wh.poolMu.Unlock()
+	w.poolMu.Unlock()
 
 	if alreadyCached {
 		log.Trace("whisper envelope already cached", "hash", envelope.Hash().Hex())
 	} else {
 		log.Trace("cached whisper envelope", "hash", envelope.Hash().Hex())
-		wh.statsMu.Lock()
-		wh.stats.memoryUsed += envelope.size()
-		wh.statsMu.Unlock()
-		wh.postEvent(envelope, false) // notify the local node about the new message
-		if wh.mailServer != nil {
-			wh.mailServer.Archive(envelope)
+		w.statsMu.Lock()
+		w.stats.memoryUsed += envelope.size()
+		w.statsMu.Unlock()
+		w.postEvent(envelope, false) // notify the local node about the new message
+		if w.mailServer != nil {
+			w.mailServer.Archive(envelope)
 		}
 	}
 	return true, nil
@@ -719,7 +717,7 @@ func (w *Whisper) expire() {
 				w.stats.messagesCleared++
 				w.stats.memoryCleared += sz
 				w.stats.memoryUsed -= sz
-				return true
+				return false
 			})
 			w.expirations[expiry].Clear()
 			delete(w.expirations, expiry)
@@ -838,9 +836,8 @@ func deriveKeyMaterial(key []byte, version uint64) (derivedKey []byte, err error
 		// because it's a once in a session experience
 		derivedKey := pbkdf2.Key(key, nil, 65356, aesKeyLength, sha256.New)
 		return derivedKey, nil
-	} else {
-		return nil, unknownVersionError(version)
 	}
+	return nil, unknownVersionError(version)
 }
 
 // GenerateRandomID generates a random string, which is then returned to be used as a key id

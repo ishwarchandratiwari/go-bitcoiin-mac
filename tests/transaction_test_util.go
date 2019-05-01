@@ -1,18 +1,18 @@
-// Copyright 2015 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package tests
 
@@ -22,12 +22,12 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/common/hexutil"
-	"github.com/bitcoiinBT2/go-bitcoiin/common/math"
-	"github.com/bitcoiinBT2/go-bitcoiin/core/types"
-	"github.com/bitcoiinBT2/go-bitcoiin/params"
-	"github.com/bitcoiinBT2/go-bitcoiin/rlp"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common/hexutil"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common/math"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core/types"
+	"git.pirl.io/bitcoiin/go-bitcoiin/params"
+	"git.pirl.io/bitcoiin/go-bitcoiin/rlp"
 )
 
 // TransactionTest checks RLP decoding and sender derivation of transactions.
@@ -72,9 +72,8 @@ func (tt *TransactionTest) Run(config *params.ChainConfig) error {
 	if err := rlp.DecodeBytes(tt.json.RLP, tx); err != nil {
 		if tt.json.Transaction == nil {
 			return nil
-		} else {
-			return fmt.Errorf("RLP decoding failed: %v", err)
 		}
+		return fmt.Errorf("RLP decoding failed: %v", err)
 	}
 	// Check sender derivation.
 	signer := types.MakeSigner(config, new(big.Int).SetUint64(uint64(tt.json.BlockNumber)))

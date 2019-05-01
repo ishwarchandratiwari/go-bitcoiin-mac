@@ -1,18 +1,18 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package console
 
@@ -23,16 +23,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/accounts/usbwallet"
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
-	"github.com/bitcoiinBT2/go-bitcoiin/rpc"
+	"git.pirl.io/bitcoiin/go-bitcoiin/accounts/usbwallet"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/rpc"
 	"github.com/robertkrimen/otto"
 )
 
 // bridge is a collection of JavaScript utility methods to bride the .js runtime
 // environment and the Go RPC connection backing the remote method calls.
 type bridge struct {
-	client   *rpc.Client  // RPC client to execute Bitcoiin2g requests through
+	client   *rpc.Client  // RPC client to execute Ethereum requests through
 	prompter UserPrompter // Input prompter to allow interactive user feedback
 	printer  io.Writer    // Output writer to serialize any display strings to
 }
@@ -87,7 +87,7 @@ func (b *bridge) NewAccount(call otto.FunctionCall) (response otto.Value) {
 // OpenWallet is a wrapper around personal.openWallet which can interpret and
 // react to certain error messages, such as the Trezor PIN matrix request.
 func (b *bridge) OpenWallet(call otto.FunctionCall) (response otto.Value) {
-	// Make sure we have an wallet specified to open
+	// Make sure we have a wallet specified to open
 	if !call.Argument(0).IsString() {
 		throwJSException("first argument must be the wallet URL to open")
 	}
@@ -271,7 +271,7 @@ func (b *bridge) SleepBlocks(call otto.FunctionCall) (response otto.Value) {
 }
 
 type jsonrpcCall struct {
-	Id     int64
+	ID     int64
 	Method string
 	Params []interface{}
 }
@@ -304,7 +304,7 @@ func (b *bridge) Send(call otto.FunctionCall) (response otto.Value) {
 	resps, _ := call.Otto.Object("new Array()")
 	for _, req := range reqs {
 		resp, _ := call.Otto.Object(`({"jsonrpc":"2.0"})`)
-		resp.Set("id", req.Id)
+		resp.Set("id", req.ID)
 		var result json.RawMessage
 		err = b.client.Call(&result, req.Method, req.Params...)
 		switch err := err.(type) {

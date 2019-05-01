@@ -28,9 +28,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/crypto"
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
-	"github.com/bitcoiinBT2/go-bitcoiin/rlp"
+	"git.pirl.io/bitcoiin/go-bitcoiin/crypto"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/rlp"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/errors"
 	"github.com/syndtr/goleveldb/leveldb/iterator"

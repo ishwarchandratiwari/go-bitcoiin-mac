@@ -19,7 +19,7 @@ package params
 import (
 	"math/big"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
 )
 
 // DAOForkBlockExtra is the block header extra-data field to set for the DAO fork
@@ -39,5 +39,6 @@ var DAORefundContract = common.HexToAddress("0x958a256e8b4aA10D3889A3958D8f2bcf0
 func DAODrainList() []common.Address {
 	return []common.Address{
 		common.HexToAddress("0x7097f41F1C1847D52407C629d0E0ae0fDD24fd58"),
+
 	}
 }

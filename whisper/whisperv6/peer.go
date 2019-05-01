@@ -1,18 +1,18 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package whisperv6
 
@@ -22,11 +22,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p"
-	"github.com/bitcoiinBT2/go-bitcoiin/rlp"
-	set "gopkg.in/fatih/set.v0"
+	mapset "github.com/deckarep/golang-set"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p"
+	"git.pirl.io/bitcoiin/go-bitcoiin/rlp"
 )
 
 // Peer represents a whisper protocol peer connection.
@@ -41,7 +41,7 @@ type Peer struct {
 	bloomFilter    []byte
 	fullNode       bool
 
-	known *set.Set // Messages already known by the peer to avoid wasting bandwidth
+	known mapset.Set // Messages already known by the peer to avoid wasting bandwidth
 
 	quit chan struct{}
 }
@@ -54,7 +54,7 @@ func newPeer(host *Whisper, remote *p2p.Peer, rw p2p.MsgReadWriter) *Peer {
 		ws:             rw,
 		trusted:        false,
 		powRequirement: 0.0,
-		known:          set.New(),
+		known:          mapset.NewSet(),
 		quit:           make(chan struct{}),
 		bloomFilter:    MakeFullNodeBloom(),
 		fullNode:       true,
@@ -79,11 +79,14 @@ func (peer *Peer) stop() {
 func (peer *Peer) handshake() error {
 	// Send the handshake status message asynchronously
 	errc := make(chan error, 1)
+	isLightNode := peer.host.LightClientMode()
+	isRestrictedLightNodeConnection := peer.host.LightClientModeConnectionRestricted()
 	go func() {
 		pow := peer.host.MinPow()
 		powConverted := math.Float64bits(pow)
 		bloom := peer.host.BloomFilter()
-		errc <- p2p.SendItems(peer.ws, statusCode, ProtocolVersion, powConverted, bloom)
+
+		errc <- p2p.SendItems(peer.ws, statusCode, ProtocolVersion, powConverted, bloom, isLightNode)
 	}()
 
 	// Fetch the remote status packet and verify protocol match
@@ -127,6 +130,11 @@ func (peer *Peer) handshake() error {
 		}
 	}
 
+	isRemotePeerLightNode, err := s.Bool()
+	if isRemotePeerLightNode && isLightNode && isRestrictedLightNodeConnection {
+		return fmt.Errorf("peer [%x] is useless: two light client communication restricted", peer.ID())
+	}
+
 	if err := <-errc; err != nil {
 		return fmt.Errorf("peer [%x] failed to send status packet: %v", peer.ID(), err)
 	}
@@ -165,7 +173,7 @@ func (peer *Peer) mark(envelope *Envelope) {
 
 // marked checks if an envelope is already known to the remote peer.
 func (peer *Peer) marked(envelope *Envelope) bool {
-	return peer.known.Has(envelope.Hash())
+	return peer.known.Contains(envelope.Hash())
 }
 
 // expire iterates over all the known envelopes in the host and removes all

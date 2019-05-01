@@ -17,9 +17,9 @@
 package core
 
 import (
-	"github.com/bitcoiinBT2/go-bitcoiin/core/state"
-	"github.com/bitcoiinBT2/go-bitcoiin/core/types"
-	"github.com/bitcoiinBT2/go-bitcoiin/core/vm"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core/state"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core/types"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core/vm"
 )
 
 // Validator is an interface which defines the standard for block validation. It

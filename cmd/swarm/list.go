@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of go-bitcoiin2g.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-bitcoiin2g is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-bitcoiin2g is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-bitcoiin2g. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -22,10 +22,19 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/cmd/utils"
-	swarm "github.com/bitcoiinBT2/go-bitcoiin/swarm/api/client"
+	"git.pirl.io/bitcoiin/go-bitcoiin/cmd/utils"
+	swarm "git.pirl.io/bitcoiin/go-bitcoiin/swarm/api/client"
 	"gopkg.in/urfave/cli.v1"
 )
+
+var listCommand = cli.Command{
+	Action:             list,
+	CustomHelpTemplate: helpTemplate,
+	Name:               "ls",
+	Usage:              "list files and directories contained in a manifest",
+	ArgsUsage:          "<manifest> [<prefix>]",
+	Description:        "Lists files and directories contained in a manifest",
+}
 
 func list(ctx *cli.Context) {
 	args := ctx.Args()
@@ -44,7 +53,7 @@ func list(ctx *cli.Context) {
 
 	bzzapi := strings.TrimRight(ctx.GlobalString(SwarmApiFlag.Name), "/")
 	client := swarm.NewClient(bzzapi)
-	list, err := client.List(manifest, prefix)
+	list, err := client.List(manifest, prefix, "")
 	if err != nil {
 		utils.Fatalf("Failed to generate file and directory list: %s", err)
 	}

@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package testing
 
@@ -22,10 +22,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p/discover"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p/simulations/adapters"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p/enode"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p/simulations/adapters"
 )
 
 var errTimedOut = errors.New("timed out")
@@ -35,7 +35,7 @@ var errTimedOut = errors.New("timed out")
 // receive (expect) messages
 type ProtocolSession struct {
 	Server  *p2p.Server
-	IDs     []discover.NodeID
+	Nodes   []*enode.Node
 	adapter *adapters.SimAdapter
 	events  chan *p2p.PeerEvent
 }
@@ -56,32 +56,32 @@ type Exchange struct {
 // Trigger is part of the exchange, incoming message for the pivot node
 // sent by a peer
 type Trigger struct {
-	Msg     interface{}     // type of message to be sent
-	Code    uint64          // code of message is given
-	Peer    discover.NodeID // the peer to send the message to
-	Timeout time.Duration   // timeout duration for the sending
+	Msg     interface{}   // type of message to be sent
+	Code    uint64        // code of message is given
+	Peer    enode.ID      // the peer to send the message to
+	Timeout time.Duration // timeout duration for the sending
 }
 
 // Expect is part of an exchange, outgoing message from the pivot node
 // received by a peer
 type Expect struct {
-	Msg     interface{}     // type of message to expect
-	Code    uint64          // code of message is now given
-	Peer    discover.NodeID // the peer that expects the message
-	Timeout time.Duration   // timeout duration for receiving
+	Msg     interface{}   // type of message to expect
+	Code    uint64        // code of message is now given
+	Peer    enode.ID      // the peer that expects the message
+	Timeout time.Duration // timeout duration for receiving
 }
 
 // Disconnect represents a disconnect event, used and checked by TestDisconnected
 type Disconnect struct {
-	Peer  discover.NodeID // discconnected peer
-	Error error           // disconnect reason
+	Peer  enode.ID // discconnected peer
+	Error error    // disconnect reason
 }
 
 // trigger sends messages from peers
-func (self *ProtocolSession) trigger(trig Trigger) error {
-	simNode, ok := self.adapter.GetNode(trig.Peer)
+func (s *ProtocolSession) trigger(trig Trigger) error {
+	simNode, ok := s.adapter.GetNode(trig.Peer)
 	if !ok {
-		return fmt.Errorf("trigger: peer %v does not exist (1- %v)", trig.Peer, len(self.IDs))
+		return fmt.Errorf("trigger: peer %v does not exist (1- %v)", trig.Peer, len(s.Nodes))
 	}
 	mockNode, ok := simNode.Services()[0].(*mockNode)
 	if !ok {
@@ -91,7 +91,9 @@ func (self *ProtocolSession) trigger(trig Trigger) error {
 	errc := make(chan error)
 
 	go func() {
+		log.Trace(fmt.Sprintf("trigger %v (%v)....", trig.Msg, trig.Code))
 		errc <- mockNode.Trigger(&trig)
+		log.Trace(fmt.Sprintf("triggered %v (%v)", trig.Msg, trig.Code))
 	}()
 
 	t := trig.Timeout
@@ -107,9 +109,9 @@ func (self *ProtocolSession) trigger(trig Trigger) error {
 }
 
 // expect checks an expectation of a message sent out by the pivot node
-func (self *ProtocolSession) expect(exps []Expect) error {
+func (s *ProtocolSession) expect(exps []Expect) error {
 	// construct a map of expectations for each node
-	peerExpects := make(map[discover.NodeID][]Expect)
+	peerExpects := make(map[enode.ID][]Expect)
 	for _, exp := range exps {
 		if exp.Msg == nil {
 			return errors.New("no message to expect")
@@ -118,11 +120,11 @@ func (self *ProtocolSession) expect(exps []Expect) error {
 	}
 
 	// construct a map of mockNodes for each node
-	mockNodes := make(map[discover.NodeID]*mockNode)
+	mockNodes := make(map[enode.ID]*mockNode)
 	for nodeID := range peerExpects {
-		simNode, ok := self.adapter.GetNode(nodeID)
+		simNode, ok := s.adapter.GetNode(nodeID)
 		if !ok {
-			return fmt.Errorf("trigger: peer %v does not exist (1- %v)", nodeID, len(self.IDs))
+			return fmt.Errorf("trigger: peer %v does not exist (1- %v)", nodeID, len(s.Nodes))
 		}
 		mockNode, ok := simNode.Services()[0].(*mockNode)
 		if !ok {
@@ -202,9 +204,9 @@ func (self *ProtocolSession) expect(exps []Expect) error {
 }
 
 // TestExchanges tests a series of exchanges against the session
-func (self *ProtocolSession) TestExchanges(exchanges ...Exchange) error {
+func (s *ProtocolSession) TestExchanges(exchanges ...Exchange) error {
 	for i, e := range exchanges {
-		if err := self.testExchange(e); err != nil {
+		if err := s.testExchange(e); err != nil {
 			return fmt.Errorf("exchange #%d %q: %v", i, e.Label, err)
 		}
 		log.Trace(fmt.Sprintf("exchange #%d %q: run successfully", i, e.Label))
@@ -214,14 +216,14 @@ func (self *ProtocolSession) TestExchanges(exchanges ...Exchange) error {
 
 // testExchange tests a single Exchange.
 // Default timeout value is 2 seconds.
-func (self *ProtocolSession) testExchange(e Exchange) error {
+func (s *ProtocolSession) testExchange(e Exchange) error {
 	errc := make(chan error)
 	done := make(chan struct{})
 	defer close(done)
 
 	go func() {
 		for _, trig := range e.Triggers {
-			err := self.trigger(trig)
+			err := s.trigger(trig)
 			if err != nil {
 				errc <- err
 				return
@@ -229,7 +231,7 @@ func (self *ProtocolSession) testExchange(e Exchange) error {
 		}
 
 		select {
-		case errc <- self.expect(e.Expects):
+		case errc <- s.expect(e.Expects):
 		case <-done:
 		}
 	}()
@@ -250,8 +252,8 @@ func (self *ProtocolSession) testExchange(e Exchange) error {
 
 // TestDisconnected tests the disconnections given as arguments
 // the disconnect structs describe what disconnect error is expected on which peer
-func (self *ProtocolSession) TestDisconnected(disconnects ...*Disconnect) error {
-	expects := make(map[discover.NodeID]error)
+func (s *ProtocolSession) TestDisconnected(disconnects ...*Disconnect) error {
+	expects := make(map[enode.ID]error)
 	for _, disconnect := range disconnects {
 		expects[disconnect.Peer] = disconnect.Error
 	}
@@ -259,7 +261,7 @@ func (self *ProtocolSession) TestDisconnected(disconnects ...*Disconnect) error 
 	timeout := time.After(time.Second)
 	for len(expects) > 0 {
 		select {
-		case event := <-self.events:
+		case event := <-s.events:
 			if event.Type != p2p.PeerEventTypeDrop {
 				continue
 			}

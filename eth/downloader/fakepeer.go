@@ -1,33 +1,34 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package downloader
 
 import (
 	"math/big"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/core"
-	"github.com/bitcoiinBT2/go-bitcoiin/core/types"
-	"github.com/bitcoiinBT2/go-bitcoiin/ethdb"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core/rawdb"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core/types"
+	"git.pirl.io/bitcoiin/go-bitcoiin/ethdb"
 )
 
 // FakePeer is a mock downloader peer that operates on a local database instance
 // instead of being an actual live node. It's useful for testing and to implement
-// sync commands from an xisting local database.
+// sync commands from an existing local database.
 type FakePeer struct {
 	id string
 	db ethdb.Database
@@ -48,7 +49,7 @@ func (p *FakePeer) Head() (common.Hash, *big.Int) {
 }
 
 // RequestHeadersByHash implements downloader.Peer, returning a batch of headers
-// defined by the origin hash and the associaed query parameters.
+// defined by the origin hash and the associated query parameters.
 func (p *FakePeer) RequestHeadersByHash(hash common.Hash, amount int, skip int, reverse bool) error {
 	var (
 		headers []*types.Header
@@ -92,7 +93,7 @@ func (p *FakePeer) RequestHeadersByHash(hash common.Hash, amount int, skip int, 
 }
 
 // RequestHeadersByNumber implements downloader.Peer, returning a batch of headers
-// defined by the origin number and the associaed query parameters.
+// defined by the origin number and the associated query parameters.
 func (p *FakePeer) RequestHeadersByNumber(number uint64, amount int, skip int, reverse bool) error {
 	var (
 		headers []*types.Header
@@ -126,7 +127,7 @@ func (p *FakePeer) RequestBodies(hashes []common.Hash) error {
 		uncles [][]*types.Header
 	)
 	for _, hash := range hashes {
-		block := core.GetBlock(p.db, hash, p.hc.GetBlockNumber(hash))
+		block := rawdb.ReadBlock(p.db, hash, *p.hc.GetBlockNumber(hash))
 
 		txs = append(txs, block.Transactions())
 		uncles = append(uncles, block.Uncles())
@@ -140,7 +141,7 @@ func (p *FakePeer) RequestBodies(hashes []common.Hash) error {
 func (p *FakePeer) RequestReceipts(hashes []common.Hash) error {
 	var receipts [][]*types.Receipt
 	for _, hash := range hashes {
-		receipts = append(receipts, core.GetBlockReceipts(p.db, hash, p.hc.GetBlockNumber(hash)))
+		receipts = append(receipts, rawdb.ReadReceipts(p.db, hash, *p.hc.GetBlockNumber(hash)))
 	}
 	p.dl.DeliverReceipts(p.id, receipts)
 	return nil

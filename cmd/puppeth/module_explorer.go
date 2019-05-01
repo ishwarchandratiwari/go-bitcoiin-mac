@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of go-bitcoiin2g.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-bitcoiin2g is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-bitcoiin2g is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-bitcoiin2g. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -25,7 +25,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
 )
 
 // explorerDockerfile is the Dockerfile required to run a block explorer.
@@ -37,8 +37,8 @@ ADD chain.json /chain.json
 
 RUN \
   echo '(cd ../eth-net-intelligence-api && pm2 start /ethstats.json)' >  explorer.sh && \
-	echo '(cd ../bitcoiinchain-light && npm start &)'                      >> explorer.sh && \
-	echo '/parity/parity --chain=/chain.json --port={{.NodePort}} --tracing=on --fat-db=on --pruning=archive' >> explorer.sh
+	echo '(cd ../etherchain-light && npm start &)'                      >> explorer.sh && \
+	echo 'exec /parity/parity --chain=/chain.json --port={{.NodePort}} --tracing=on --fat-db=on --pruning=archive' >> explorer.sh
 
 ENTRYPOINT ["/bin/sh", "explorer.sh"]
 `
@@ -77,12 +77,13 @@ services:
   explorer:
     build: .
     image: {{.Network}}/explorer
+    container_name: {{.Network}}_explorer_1
     ports:
       - "{{.NodePort}}:{{.NodePort}}"
       - "{{.NodePort}}:{{.NodePort}}/udp"{{if not .VHost}}
       - "{{.WebPort}}:3000"{{end}}
     volumes:
-      - {{.Datadir}}:/root/.local/share/io.parity.bitcoiin2g
+      - {{.Datadir}}:/root/.local/share/io.parity.ethereum
     environment:
       - NODE_PORT={{.NodePort}}/tcp
       - STATS={{.Ethstats}}{{if .VHost}}
@@ -140,9 +141,9 @@ func deployExplorer(client *sshClient, network string, chainspec []byte, config 
 
 	// Build and deploy the boot or seal node service
 	if nocache {
-		return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s build --pull --no-cache && docker-compose -p %s up -d --force-recreate", workdir, network, network))
+		return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s build --pull --no-cache && docker-compose -p %s up -d --force-recreate --timeout 60", workdir, network, network))
 	}
-	return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s up -d --build --force-recreate", workdir, network))
+	return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s up -d --build --force-recreate --timeout 60", workdir, network))
 }
 
 // explorerInfos is returned from a block explorer status check to allow reporting
@@ -168,7 +169,7 @@ func (info *explorerInfos) Report() map[string]string {
 	return report
 }
 
-// checkExplorer does a health-check against an block explorer server to verify
+// checkExplorer does a health-check against a block explorer server to verify
 // whether it's running, and if yes, whether it's responsive.
 func checkExplorer(client *sshClient, network string) (*explorerInfos, error) {
 	// Inspect a possible block explorer container on the host
@@ -201,7 +202,7 @@ func checkExplorer(client *sshClient, network string) (*explorerInfos, error) {
 	}
 	// Assemble and return the useful infos
 	stats := &explorerInfos{
-		datadir:  infos.volumes["/root/.local/share/io.parity.bitcoiin2g"],
+		datadir:  infos.volumes["/root/.local/share/io.parity.ethereum"],
 		nodePort: nodePort,
 		webHost:  host,
 		webPort:  webPort,

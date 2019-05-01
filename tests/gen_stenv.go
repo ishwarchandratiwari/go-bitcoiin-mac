@@ -7,8 +7,8 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/common/math"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common/math"
 )
 
 var _ = (*stEnvMarshaling)(nil)

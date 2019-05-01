@@ -1,25 +1,25 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of go-bitcoiin2g.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-bitcoiin2g is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-bitcoiin2g is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-bitcoiin2g. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
 import (
 	"fmt"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
 )
 
 // deployDashboard queries the user for various input on deploying a web-service
@@ -92,7 +92,7 @@ func (w *wizard) deployDashboard() {
 				pages = append(pages, page)
 			}
 		}
-		// Promt the user to chose one, enter manually or simply not list this service
+		// Prompt the user to chose one, enter manually or simply not list this service
 		defLabel, defChoice := "don't list", len(pages)+2
 		if len(pages) > 0 {
 			defLabel, defChoice = pages[0], 1
@@ -137,14 +137,14 @@ func (w *wizard) deployDashboard() {
 	if w.conf.ethstats != "" {
 		fmt.Println()
 		fmt.Println("Include ethstats secret on dashboard (y/n)? (default = yes)")
-		infos.trusted = w.readDefaultString("y") == "y"
+		infos.trusted = w.readDefaultYesNo(true)
 	}
 	// Try to deploy the dashboard container on the host
 	nocache := false
 	if existed {
 		fmt.Println()
 		fmt.Printf("Should the dashboard be built from scratch (y/n)? (default = no)\n")
-		nocache = w.readDefaultString("n") != "n"
+		nocache = w.readDefaultYesNo(false)
 	}
 	if out, err := deployDashboard(client, w.network, &w.conf, infos, nocache); err != nil {
 		log.Error("Failed to deploy dashboard container", "err", err)

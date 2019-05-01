@@ -2,21 +2,19 @@
 # with Go source code. If you know what GOPATH is then you probably
 # don't need to bother with make.
 
-.PHONY: bitcoiinGo android ios bitcoiinGo-cross swarm evm all test clean
-.PHONY: bitcoiinGo-linux bitcoiinGo-linux-386 bitcoiinGo-linux-amd64 bitcoiinGo-linux-mips64 bitcoiinGo-linux-mips64le
-.PHONY: bitcoiinGo-linux-arm bitcoiinGo-linux-arm-5 bitcoiinGo-linux-arm-6 bitcoiinGo-linux-arm-7 bitcoiinGo-linux-arm64
-.PHONY: bitcoiinGo-darwin bitcoiinGo-darwin-386 bitcoiinGo-darwin-amd64
-.PHONY: bitcoiinGo-windows bitcoiinGo-windows-386 bitcoiinGo-windows-amd64
-
+.PHONY: pirl android ios pirl-cross swarm evm all test clean
+.PHONY: pirl-linux pirl-linux-386 pirl-linux-amd64 pirl-linux-mips64 pirl-linux-mips64le
+.PHONY: pirl-linux-arm pirl-linux-arm-5 pirl-linux-arm-6 pirl-linux-arm-7 pirl-linux-arm64
+.PHONY: pirl-darwin pirl-darwin-386 pirl-darwin-amd64
+.PHONY: pirl-windows pirl-windows-386 pirl-windows-amd64
+##export GOPATH=$(pwd)
 GOBIN = $(shell pwd)/build/bin
 GO ?= latest
 
-bitcoiinGo:
-	build/env.sh go run build/ci.go install ./cmd/bitcoiinGo
-	cd ./build/bin/
-	./build/bin/bitcoiinGo init ./build/bin/genesis.json
+pirl:
+	build/env.sh go run build/ci.go install ./cmd/pirl
 	@echo "Done building."
-	@echo "Run \"$(GOBIN)/bitcoiinGo\" to launch bitcoiinGo."
+	@echo "Run \"$(GOBIN)/pirl\" to launch pirl."
 
 swarm:
 	build/env.sh go run build/ci.go install ./cmd/swarm
@@ -25,20 +23,16 @@ swarm:
 
 all:
 	build/env.sh go run build/ci.go install
-	cd ./build/bin/
-	./build/bin/bitcoiinGo init ./build/bin/genesis.json
-	@echo "Done building."
-	@echo "Run \"$(GOBIN)/bitcoiinGo\" to launch bitcoiinGo."
 
 android:
 	build/env.sh go run build/ci.go aar --local
 	@echo "Done building."
-	@echo "Import \"$(GOBIN)/bitcoiinGo.aar\" to use the library."
+	@echo "Import \"$(GOBIN)/pirl.aar\" to use the library."
 
 ios:
 	build/env.sh go run build/ci.go xcode --local
 	@echo "Done building."
-	@echo "Import \"$(GOBIN)/BitcoiinGo.framework\" to use the library."
+	@echo "Import \"$(GOBIN)/pirl.framework\" to use the library."
 
 test: all
 	build/env.sh go run build/ci.go test
@@ -61,92 +55,92 @@ devtools:
 
 # Cross Compilation Targets (xgo)
 
-bitcoiinGo-cross: bitcoiinGo-linux bitcoiinGo-darwin bitcoiinGo-windows bitcoiinGo-android bitcoiinGo-ios
+pirl-cross: pirl-linux pirl-darwin pirl-windows pirl-android pirl-ios
 	@echo "Full cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-*
+	@ls -ld $(GOBIN)/pirl-*
 
-bitcoiinGo-linux: bitcoiinGo-linux-386 bitcoiinGo-linux-amd64 bitcoiinGo-linux-arm bitcoiinGo-linux-mips64 bitcoiinGo-linux-mips64le
+pirl-linux: pirl-linux-386 pirl-linux-amd64 pirl-linux-arm pirl-linux-mips64 pirl-linux-mips64le
 	@echo "Linux cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-linux-*
+	@ls -ld $(GOBIN)/pirl-linux-*
 
-bitcoiinGo-linux-386:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/386 -v ./cmd/bitcoiinGo
+pirl-linux-386:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/386 -v ./cmd/pirl
 	@echo "Linux 386 cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-linux-* | grep 386
+	@ls -ld $(GOBIN)/pirl-linux-* | grep 386
 
-bitcoiinGo-linux-amd64:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/amd64 -v ./cmd/bitcoiinGo
+pirl-linux-amd64:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/amd64 -v ./cmd/pirl
 	@echo "Linux amd64 cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-linux-* | grep amd64
+	@ls -ld $(GOBIN)/pirl-linux-* | grep amd64
 
-bitcoiinGo-linux-arm: bitcoiinGo-linux-arm-5 bitcoiinGo-linux-arm-6 bitcoiinGo-linux-arm-7 bitcoiinGo-linux-arm64
+pirl-linux-arm: pirl-linux-arm-5 pirl-linux-arm-6 pirl-linux-arm-7 pirl-linux-arm64
 	@echo "Linux ARM cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-linux-* | grep arm
+	@ls -ld $(GOBIN)/pirl-linux-* | grep arm
 
-bitcoiinGo-linux-arm-5:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm-5 -v ./cmd/bitcoiinGo
+pirl-linux-arm-5:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm-5 -v ./cmd/pirl
 	@echo "Linux ARMv5 cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-linux-* | grep arm-5
+	@ls -ld $(GOBIN)/pirl-linux-* | grep arm-5
 
-bitcoiinGo-linux-arm-6:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm-6 -v ./cmd/bitcoiinGo
+pirl-linux-arm-6:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm-6 -v ./cmd/pirl
 	@echo "Linux ARMv6 cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-linux-* | grep arm-6
+	@ls -ld $(GOBIN)/pirl-linux-* | grep arm-6
 
-bitcoiinGo-linux-arm-7:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm-7 -v ./cmd/bitcoiinGo
+pirl-linux-arm-7:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm-7 -v ./cmd/pirl
 	@echo "Linux ARMv7 cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-linux-* | grep arm-7
+	@ls -ld $(GOBIN)/pirl-linux-* | grep arm-7
 
-bitcoiinGo-linux-arm64:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm64 -v ./cmd/bitcoiinGo
+pirl-linux-arm64:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/arm64 -v ./cmd/pirl
 	@echo "Linux ARM64 cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-linux-* | grep arm64
+	@ls -ld $(GOBIN)/pirl-linux-* | grep arm64
 
-bitcoiinGo-linux-mips:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mips --ldflags '-extldflags "-static"' -v ./cmd/bitcoiinGo
+pirl-linux-mips:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mips --ldflags '-extldflags "-static"' -v ./cmd/pirl
 	@echo "Linux MIPS cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-linux-* | grep mips
+	@ls -ld $(GOBIN)/pirl-linux-* | grep mips
 
-bitcoiinGo-linux-mipsle:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mipsle --ldflags '-extldflags "-static"' -v ./cmd/bitcoiinGo
+pirl-linux-mipsle:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mipsle --ldflags '-extldflags "-static"' -v ./cmd/pirl
 	@echo "Linux MIPSle cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-linux-* | grep mipsle
+	@ls -ld $(GOBIN)/pirl-linux-* | grep mipsle
 
-bitcoiinGo-linux-mips64:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mips64 --ldflags '-extldflags "-static"' -v ./cmd/bitcoiinGo
+pirl-linux-mips64:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mips64 --ldflags '-extldflags "-static"' -v ./cmd/pirl
 	@echo "Linux MIPS64 cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-linux-* | grep mips64
+	@ls -ld $(GOBIN)/pirl-linux-* | grep mips64
 
-bitcoiinGo-linux-mips64le:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mips64le --ldflags '-extldflags "-static"' -v ./cmd/bitcoiinGo
+pirl-linux-mips64le:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=linux/mips64le --ldflags '-extldflags "-static"' -v ./cmd/pirl
 	@echo "Linux MIPS64le cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-linux-* | grep mips64le
+	@ls -ld $(GOBIN)/pirl-linux-* | grep mips64le
 
-bitcoiinGo-darwin: bitcoiinGo-darwin-386 bitcoiinGo-darwin-amd64
+pirl-darwin: pirl-darwin-386 pirl-darwin-amd64
 	@echo "Darwin cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-darwin-*
+	@ls -ld $(GOBIN)/pirl-darwin-*
 
-bitcoiinGo-darwin-386:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=darwin/386 -v ./cmd/bitcoiinGo
+pirl-darwin-386:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=darwin/386 -v ./cmd/pirl
 	@echo "Darwin 386 cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-darwin-* | grep 386
+	@ls -ld $(GOBIN)/pirl-darwin-* | grep 386
 
-bitcoiinGo-darwin-amd64:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=darwin/amd64 -v ./cmd/bitcoiinGo
+pirl-darwin-amd64:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=darwin/amd64 -v ./cmd/pirl
 	@echo "Darwin amd64 cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-darwin-* | grep amd64
+	@ls -ld $(GOBIN)/pirl-darwin-* | grep amd64
 
-bitcoiinGo-windows: bitcoiinGo-windows-386 bitcoiinGo-windows-amd64
+pirl-windows: pirl-windows-386 pirl-windows-amd64
 	@echo "Windows cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-windows-*
+	@ls -ld $(GOBIN)/pirl-windows-*
 
-bitcoiinGo-windows-386:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=windows/386 -v ./cmd/bitcoiinGo
+pirl-windows-386:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=windows/386 -v ./cmd/pirl
 	@echo "Windows 386 cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-windows-* | grep 386
+	@ls -ld $(GOBIN)/pirl-windows-* | grep 386
 
-bitcoiinGo-windows-amd64:
-	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=windows/amd64 -v ./cmd/bitcoiinGo
+pirl-windows-amd64:
+	build/env.sh go run build/ci.go xgo -- --go=$(GO) --targets=windows/amd64 -v ./cmd/pirl
 	@echo "Windows amd64 cross compilation done:"
-	@ls -ld $(GOBIN)/bitcoiinGo-windows-* | grep amd64
+	@ls -ld $(GOBIN)/pirl-windows-* | grep amd64

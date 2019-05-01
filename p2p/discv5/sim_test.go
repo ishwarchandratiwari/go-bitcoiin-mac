@@ -28,7 +28,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
 )
 
 // In this test, nodes try to randomly resolve each other.

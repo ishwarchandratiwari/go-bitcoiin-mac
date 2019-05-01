@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package core
 
@@ -21,10 +21,10 @@ import (
 	"io"
 	"os"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/core/types"
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
-	"github.com/bitcoiinBT2/go-bitcoiin/rlp"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core/types"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/rlp"
 )
 
 // errNoActiveJournal is returned if a transaction is attempted to be inserted
@@ -34,7 +34,7 @@ var errNoActiveJournal = errors.New("no active journal")
 // devNull is a WriteCloser that just discards anything written into it. Its
 // goal is to allow the transaction journal to write into a fake journal when
 // loading transactions on startup without printing warnings due to no file
-// being readt for write.
+// being read for write.
 type devNull struct{}
 
 func (*devNull) Write(p []byte) (n int, err error) { return len(p), nil }
@@ -56,8 +56,8 @@ func newTxJournal(path string) *txJournal {
 
 // load parses a transaction journal dump from disk, loading its contents into
 // the specified pool.
-func (journal *txJournal) load(add func(*types.Transaction) error) error {
-	// Skip the parsing if the journal file doens't exist at all
+func (journal *txJournal) load(add func([]*types.Transaction) []error) error {
+	// Skip the parsing if the journal file doesn't exist at all
 	if _, err := os.Stat(journal.path); os.IsNotExist(err) {
 		return nil
 	}
@@ -76,7 +76,21 @@ func (journal *txJournal) load(add func(*types.Transaction) error) error {
 	stream := rlp.NewStream(input, 0)
 	total, dropped := 0, 0
 
-	var failure error
+	// Create a method to load a limited batch of transactions and bump the
+	// appropriate progress counters. Then use this method to load all the
+	// journaled transactions in small-ish batches.
+	loadBatch := func(txs types.Transactions) {
+		for _, err := range add(txs) {
+			if err != nil {
+				log.Debug("Failed to add journaled transaction", "err", err)
+				dropped++
+			}
+		}
+	}
+	var (
+		failure error
+		batch   types.Transactions
+	)
 	for {
 		// Parse the next transaction and terminate on error
 		tx := new(types.Transaction)
@@ -84,14 +98,17 @@ func (journal *txJournal) load(add func(*types.Transaction) error) error {
 			if err != io.EOF {
 				failure = err
 			}
+			if batch.Len() > 0 {
+				loadBatch(batch)
+			}
 			break
 		}
-		// Import the transaction and bump the appropriate progress counters
+		// New transaction parsed, queue up for later, import if threshold is reached
 		total++
-		if err = add(tx); err != nil {
-			log.Debug("Failed to add journaled transaction", "err", err)
-			dropped++
-			continue
+
+		if batch = append(batch, tx); batch.Len() > 1024 {
+			loadBatch(batch)
+			batch = batch[:0]
 		}
 	}
 	log.Info("Loaded local transaction journal", "transactions", total, "dropped", dropped)

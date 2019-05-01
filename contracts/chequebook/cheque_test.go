@@ -24,12 +24,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/accounts/abi/bind"
-	"github.com/bitcoiinBT2/go-bitcoiin/accounts/abi/bind/backends"
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/contracts/chequebook/contract"
-	"github.com/bitcoiinBT2/go-bitcoiin/core"
-	"github.com/bitcoiinBT2/go-bitcoiin/crypto"
+	"git.pirl.io/bitcoiin/go-bitcoiin/accounts/abi/bind"
+	"git.pirl.io/bitcoiin/go-bitcoiin/accounts/abi/bind/backends"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/contracts/chequebook/contract"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core"
+	"git.pirl.io/bitcoiin/go-bitcoiin/crypto"
 )
 
 var (
@@ -46,7 +46,7 @@ func newTestBackend() *backends.SimulatedBackend {
 		addr0: {Balance: big.NewInt(1000000000)},
 		addr1: {Balance: big.NewInt(1000000000)},
 		addr2: {Balance: big.NewInt(1000000000)},
-	})
+	}, 10000000)
 }
 
 func deploy(prvKey *ecdsa.PrivateKey, amount *big.Int, backend *backends.SimulatedBackend) (common.Address, error) {

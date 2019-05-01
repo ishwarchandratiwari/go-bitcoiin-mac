@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package bitutil
 
@@ -21,7 +21,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common/hexutil"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common/hexutil"
 )
 
 // Tests that data bitset encoding and decoding works and is bijective.
@@ -117,7 +117,7 @@ func TestDecodingCycle(t *testing.T) {
 // TestCompression tests that compression works by returning either the bitset
 // encoded input, or the actual input if the bitset version is longer.
 func TestCompression(t *testing.T) {
-	// Check the the compression returns the bitset encoding is shorter
+	// Check the compression returns the bitset encoding is shorter
 	in := hexutil.MustDecode("0x4912385c0e7b64000000")
 	out := hexutil.MustDecode("0x80fe4912385c0e7b64")
 
@@ -127,7 +127,7 @@ func TestCompression(t *testing.T) {
 	if data, err := DecompressBytes(out, len(in)); err != nil || !bytes.Equal(data, in) {
 		t.Errorf("decoding mismatch for sparse data: have %x, want %x, error %v", data, in, err)
 	}
-	// Check the the compression returns the input if the bitset encoding is longer
+	// Check the compression returns the input if the bitset encoding is longer
 	in = hexutil.MustDecode("0xdf7070533534333636313639343638373532313536346c1bc33339343837313070706336343035336336346c65fefb3930393233383838ac2f65fefb")
 	out = hexutil.MustDecode("0xdf7070533534333636313639343638373532313536346c1bc33339343837313070706336343035336336346c65fefb3930393233383838ac2f65fefb")
 

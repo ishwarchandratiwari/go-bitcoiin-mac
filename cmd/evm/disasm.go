@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of go-bitcoiin2g.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-bitcoiin2g is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-bitcoiin2g is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-bitcoiin2g. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -22,7 +22,7 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/core/asm"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core/asm"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
@@ -44,7 +44,7 @@ func disasmCmd(ctx *cli.Context) error {
 		return err
 	}
 
-	code := strings.TrimSpace(string(in[:]))
+	code := strings.TrimSpace(string(in))
 	fmt.Printf("%v\n", code)
 	return asm.PrintDisassembled(code)
 }

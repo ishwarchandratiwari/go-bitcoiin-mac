@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 /*
 the p2p/testing package provides a unit test scheme to check simple
@@ -30,16 +30,15 @@ import (
 	"io/ioutil"
 	"strings"
 	"sync"
-	"testing"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
-	"github.com/bitcoiinBT2/go-bitcoiin/node"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p/discover"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p/simulations"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p/simulations/adapters"
-	"github.com/bitcoiinBT2/go-bitcoiin/rlp"
-	"github.com/bitcoiinBT2/go-bitcoiin/rpc"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/node"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p/enode"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p/simulations"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p/simulations/adapters"
+	"git.pirl.io/bitcoiin/go-bitcoiin/rlp"
+	"git.pirl.io/bitcoiin/go-bitcoiin/rpc"
 )
 
 // ProtocolTester is the tester environment used for unit testing protocol
@@ -52,7 +51,7 @@ type ProtocolTester struct {
 // NewProtocolTester constructs a new ProtocolTester
 // it takes as argument the pivot node id, the number of dummy peers and the
 // protocol run function called on a peer connection by the p2p server
-func NewProtocolTester(t *testing.T, id discover.NodeID, n int, run func(*p2p.Peer, p2p.MsgReadWriter) error) *ProtocolTester {
+func NewProtocolTester(id enode.ID, n int, run func(*p2p.Peer, p2p.MsgReadWriter) error) *ProtocolTester {
 	services := adapters.Services{
 		"test": func(ctx *adapters.ServiceContext) (node.Service, error) {
 			return &testNode{run}, nil
@@ -76,17 +75,17 @@ func NewProtocolTester(t *testing.T, id discover.NodeID, n int, run func(*p2p.Pe
 
 	node := net.GetNode(id).Node.(*adapters.SimNode)
 	peers := make([]*adapters.NodeConfig, n)
-	peerIDs := make([]discover.NodeID, n)
+	nodes := make([]*enode.Node, n)
 	for i := 0; i < n; i++ {
 		peers[i] = adapters.RandomNodeConfig()
 		peers[i].Services = []string{"mock"}
-		peerIDs[i] = peers[i].ID
+		nodes[i] = peers[i].Node()
 	}
 	events := make(chan *p2p.PeerEvent, 1000)
 	node.SubscribeEvents(events)
 	ps := &ProtocolSession{
 		Server:  node.Server(),
-		IDs:     peerIDs,
+		Nodes:   nodes,
 		adapter: adapter,
 		events:  events,
 	}
@@ -101,24 +100,24 @@ func NewProtocolTester(t *testing.T, id discover.NodeID, n int, run func(*p2p.Pe
 }
 
 // Stop stops the p2p server
-func (self *ProtocolTester) Stop() error {
-	self.Server.Stop()
+func (t *ProtocolTester) Stop() error {
+	t.Server.Stop()
 	return nil
 }
 
 // Connect brings up the remote peer node and connects it using the
 // p2p/simulations network connection with the in memory network adapter
-func (self *ProtocolTester) Connect(selfID discover.NodeID, peers ...*adapters.NodeConfig) {
+func (t *ProtocolTester) Connect(selfID enode.ID, peers ...*adapters.NodeConfig) {
 	for _, peer := range peers {
 		log.Trace(fmt.Sprintf("start node %v", peer.ID))
-		if _, err := self.network.NewNodeWithConfig(peer); err != nil {
+		if _, err := t.network.NewNodeWithConfig(peer); err != nil {
 			panic(fmt.Sprintf("error starting peer %v: %v", peer.ID, err))
 		}
-		if err := self.network.Start(peer.ID); err != nil {
+		if err := t.network.Start(peer.ID); err != nil {
 			panic(fmt.Sprintf("error starting peer %v: %v", peer.ID, err))
 		}
 		log.Trace(fmt.Sprintf("connect to %v", peer.ID))
-		if err := self.network.Connect(selfID, peer.ID); err != nil {
+		if err := t.network.Connect(selfID, peer.ID); err != nil {
 			panic(fmt.Sprintf("error connecting to peer %v: %v", peer.ID, err))
 		}
 	}
@@ -180,7 +179,8 @@ func (m *mockNode) Run(peer *p2p.Peer, rw p2p.MsgReadWriter) error {
 	for {
 		select {
 		case trig := <-m.trigger:
-			m.err <- p2p.Send(rw, trig.Code, trig.Msg)
+			wmsg := Wrap(trig.Msg)
+			m.err <- p2p.Send(rw, trig.Code, wmsg)
 		case exps := <-m.expect:
 			m.err <- expectMsgs(rw, exps)
 		case <-m.stop:
@@ -220,7 +220,7 @@ func expectMsgs(rw p2p.MsgReadWriter, exps []Expect) error {
 		}
 		var found bool
 		for i, exp := range exps {
-			if exp.Code == msg.Code && bytes.Equal(actualContent, mustEncodeMsg(exp.Msg)) {
+			if exp.Code == msg.Code && bytes.Equal(actualContent, mustEncodeMsg(Wrap(exp.Msg))) {
 				if matched[i] {
 					return fmt.Errorf("message #%d received two times", i)
 				}
@@ -235,7 +235,7 @@ func expectMsgs(rw p2p.MsgReadWriter, exps []Expect) error {
 				if matched[i] {
 					continue
 				}
-				expected = append(expected, fmt.Sprintf("code %d payload %x", exp.Code, mustEncodeMsg(exp.Msg)))
+				expected = append(expected, fmt.Sprintf("code %d payload %x", exp.Code, mustEncodeMsg(Wrap(exp.Msg))))
 			}
 			return fmt.Errorf("unexpected message code %d payload %x, expected %s", msg.Code, actualContent, strings.Join(expected, " or "))
 		}
@@ -266,4 +266,18 @@ func mustEncodeMsg(msg interface{}) []byte {
 		panic("content encode error: " + err.Error())
 	}
 	return contentEnc
+}
+
+type WrappedMsg struct {
+	Context []byte
+	Size    uint32
+	Payload []byte
+}
+
+func Wrap(msg interface{}) interface{} {
+	data, _ := rlp.EncodeToBytes(msg)
+	return &WrappedMsg{
+		Size:    uint32(len(data)),
+		Payload: data,
+	}
 }

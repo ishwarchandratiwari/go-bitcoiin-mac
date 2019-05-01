@@ -1,18 +1,20 @@
-// Copyright 2014 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2014 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
+
+// +build !js
 
 package ethdb_test
 
@@ -25,7 +27,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/ethdb"
+	"git.pirl.io/bitcoiin/go-bitcoiin/ethdb"
 )
 
 func newTestLDB() (*ethdb.LDBDatabase, func()) {
@@ -53,12 +55,33 @@ func TestLDB_PutGet(t *testing.T) {
 }
 
 func TestMemoryDB_PutGet(t *testing.T) {
-	db, _ := ethdb.NewMemDatabase()
-	testPutGet(db, t)
+	testPutGet(ethdb.NewMemDatabase(), t)
 }
 
 func testPutGet(db ethdb.Database, t *testing.T) {
 	t.Parallel()
+
+	for _, k := range test_values {
+		err := db.Put([]byte(k), nil)
+		if err != nil {
+			t.Fatalf("put failed: %v", err)
+		}
+	}
+
+	for _, k := range test_values {
+		data, err := db.Get([]byte(k))
+		if err != nil {
+			t.Fatalf("get failed: %v", err)
+		}
+		if len(data) != 0 {
+			t.Fatalf("get returned wrong result, got %q expected nil", string(data))
+		}
+	}
+
+	_, err := db.Get([]byte("non-exist-key"))
+	if err == nil {
+		t.Fatalf("expect to return a not found error")
+	}
 
 	for _, v := range test_values {
 		err := db.Put([]byte(v), []byte(v))
@@ -131,8 +154,7 @@ func TestLDB_ParallelPutGet(t *testing.T) {
 }
 
 func TestMemoryDB_ParallelPutGet(t *testing.T) {
-	db, _ := ethdb.NewMemDatabase()
-	testParallelPutGet(db, t)
+	testParallelPutGet(ethdb.NewMemDatabase(), t)
 }
 
 func testParallelPutGet(db ethdb.Database, t *testing.T) {

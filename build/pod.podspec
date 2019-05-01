@@ -1,22 +1,22 @@
 Pod::Spec.new do |spec|
-  spec.name         = 'BitcoiinGo'
+  spec.name         = 'Geth'
   spec.version      = '{{.Version}}'
   spec.license      = { :type => 'GNU Lesser General Public License, Version 3.0' }
-  spec.homepage     = 'https://github.com/bitcoiinBT2/go-bitcoiin'
+  spec.homepage     = 'https://git.pirl.io/bitcoiin/go-bitcoiin'
   spec.authors      = { {{range .Contributors}}
 		'{{.Name}}' => '{{.Email}}',{{end}}
 	}
-  spec.summary      = 'iOS Bitcoiin2g Client'
-  spec.source       = { :git => 'https://github.com/bitcoiinBT2/go-bitcoiin.git', :commit => '{{.Commit}}' }
+  spec.summary      = 'iOS Ethereum Client'
+  spec.source       = { :git => 'https://git.pirl.io/bitcoiin/go-bitcoiin.git', :commit => '{{.Commit}}' }
 
 	spec.platform = :ios
   spec.ios.deployment_target  = '9.0'
-	spec.ios.vendored_frameworks = 'Frameworks/BitcoiinGo.framework'
+	spec.ios.vendored_frameworks = 'Frameworks/Geth.framework'
 
 	spec.prepare_command = <<-CMD
     curl https://gethstore.blob.core.windows.net/builds/{{.Archive}}.tar.gz | tar -xvz
     mkdir Frameworks
-    mv {{.Archive}}/BitcoiinGo.framework Frameworks
+    mv {{.Archive}}/Geth.framework Frameworks
     rm -rf {{.Archive}}
   CMD
 end

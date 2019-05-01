@@ -1021,7 +1021,7 @@ var formatOutputInt = function (param) {
     var value = param.staticPart() || "0";
 
     // check if it's negative number
-    // it it is, return two's complement
+    // it is, return two's complement
     if (signedIsNegative(value)) {
         return new BigNumber(value, 16).minus(new BigNumber('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 16)).minus(1);
     }
@@ -1231,7 +1231,7 @@ SolidityParam.prototype.withOffset = function (offset) {
 };
 
 /**
- * This method should be used to combine solidity params togbitcoiin
+ * This method should be used to combine solidity params together
  * eg. when appending an array
  *
  * @method combine
@@ -1762,33 +1762,33 @@ if (typeof XMLHttpRequest === 'undefined') {
 var BigNumber = require('bignumber.js');
 
 var ETH_UNITS = [
-    'gen',
-    'kgen',
-    'Mgen',
-    'Ggen',
+    'wei',
+    'kwei',
+    'Mwei',
+    'Gwei',
     'szabo',
     'finney',
-    'femtobitcoiin',
-    'picobitcoiin',
-    'nanobitcoiin',
-    'microbitcoiin',
-    'millibitcoiin',
+    'femtoether',
+    'picoether',
+    'nanoether',
+    'microether',
+    'milliether',
     'nano',
     'micro',
     'milli',
-    'bitcoiin',
+    'ether',
     'grand',
-    'Mbitcoiin',
-    'Gbitcoiin',
-    'Tbitcoiin',
-    'Pbitcoiin',
-    'Ebitcoiin',
-    'Zbitcoiin',
-    'Ybitcoiin',
-    'Nbitcoiin',
-    'Dbitcoiin',
-    'Vbitcoiin',
-    'Ubitcoiin'
+    'Mether',
+    'Gether',
+    'Tether',
+    'Pether',
+    'Eether',
+    'Zether',
+    'Yether',
+    'Nether',
+    'Dether',
+    'Vether',
+    'Uether'
 ];
 
 module.exports = {
@@ -1884,33 +1884,33 @@ var sha3 = require('./sha3.js');
 var utf8 = require('utf8');
 
 var unitMap = {
-    'nobitcoiin':      '0',
-    'gen':          '1',
-    'kgen':         '1000',
-    'Kgen':         '1000',
+    'noether':      '0',
+    'wei':          '1',
+    'kwei':         '1000',
+    'Kwei':         '1000',
     'babbage':      '1000',
-    'femtobitcoiin':   '1000',
-    'mgen':         '1000000',
-    'Mgen':         '1000000',
+    'femtoether':   '1000',
+    'mwei':         '1000000',
+    'Mwei':         '1000000',
     'lovelace':     '1000000',
-    'picobitcoiin':    '1000000',
-    'ggen':         '1000000000',
-    'Ggen':         '1000000000',
+    'picoether':    '1000000',
+    'gwei':         '1000000000',
+    'Gwei':         '1000000000',
     'shannon':      '1000000000',
-    'nanobitcoiin':    '1000000000',
+    'nanoether':    '1000000000',
     'nano':         '1000000000',
     'szabo':        '1000000000000',
-    'microbitcoiin':   '1000000000000',
+    'microether':   '1000000000000',
     'micro':        '1000000000000',
     'finney':       '1000000000000000',
-    'millibitcoiin':    '1000000000000000',
+    'milliether':    '1000000000000000',
     'milli':         '1000000000000000',
-    'bitcoiin':        '1000000000000000000',
-    'kbitcoiin':       '1000000000000000000000',
+    'ether':        '1000000000000000000',
+    'kether':       '1000000000000000000000',
     'grand':        '1000000000000000000000',
-    'mbitcoiin':       '1000000000000000000000000',
-    'gbitcoiin':       '1000000000000000000000000000',
-    'tbitcoiin':       '1000000000000000000000000000000'
+    'mether':       '1000000000000000000000000',
+    'gether':       '1000000000000000000000000000',
+    'tether':       '1000000000000000000000000000000'
 };
 
 /**
@@ -2121,79 +2121,79 @@ var toHex = function (val) {
 };
 
 /**
- * Returns value of unit in Gen
+ * Returns value of unit in Wei
  *
  * @method getValueOfUnit
- * @param {String} unit the unit to convert to, default bitcoiin
- * @returns {BigNumber} value of the unit (in Gen)
+ * @param {String} unit the unit to convert to, default ether
+ * @returns {BigNumber} value of the unit (in Wei)
  * @throws error if the unit is not correct:w
  */
 var getValueOfUnit = function (unit) {
-    unit = unit ? unit.toLowerCase() : 'bitcoiin';
+    unit = unit ? unit.toLowerCase() : 'ether';
     var unitValue = unitMap[unit];
     if (unitValue === undefined) {
-        throw new Error('This unit doesn\'t exists, please use the nnnnnnnnnn one of the following units' + JSON.stringify(unitMap, null, 2));
+        throw new Error('This unit doesn\'t exists, please use the one of the following units' + JSON.stringify(unitMap, null, 2));
     }
     return new BigNumber(unitValue, 10);
 };
 
 /**
- * Takes a number of gen and converts it to any other bitcoiin unit.
+ * Takes a number of wei and converts it to any other ether unit.
  *
  * Possible units are:
  *   SI Short   SI Full        Effigy       Other
- * - kgen       femtobitcoiin     babbage
- * - mgen       picobitcoiin      lovelace
- * - ggen       nanobitcoiin      shannon      nano
- * - --         microbitcoiin     szabo        micro
- * - --         millibitcoiin     finney       milli
- * - bitcoiin      --             --
- * - kbitcoiin                    --           grand
- * - mbitcoiin
- * - gbitcoiin
- * - tbitcoiin
+ * - kwei       femtoether     babbage
+ * - mwei       picoether      lovelace
+ * - gwei       nanoether      shannon      nano
+ * - --         microether     szabo        micro
+ * - --         milliether     finney       milli
+ * - ether      --             --
+ * - kether                    --           grand
+ * - mether
+ * - gether
+ * - tether
  *
- * @method fromGen
+ * @method fromWei
  * @param {Number|String} number can be a number, number string or a HEX of a decimal
- * @param {String} unit the unit to convert to, default bitcoiin
+ * @param {String} unit the unit to convert to, default ether
  * @return {String|Object} When given a BigNumber object it returns one as well, otherwise a number
 */
-var fromGen = function(number, unit) {
+var fromWei = function(number, unit) {
     var returnValue = toBigNumber(number).dividedBy(getValueOfUnit(unit));
 
     return isBigNumber(number) ? returnValue : returnValue.toString(10);
 };
 
 /**
- * Takes a number of a unit and converts it to gen.
+ * Takes a number of a unit and converts it to wei.
  *
  * Possible units are:
  *   SI Short   SI Full        Effigy       Other
- * - kgen       femtobitcoiin     babbage
- * - mgen       picobitcoiin      lovelace
- * - ggen       nanobitcoiin      shannon      nano
- * - --         microbitcoiin     szabo        micro
- * - --         microbitcoiin     szabo        micro
- * - --         millibitcoiin     finney       milli
- * - bitcoiin      --             --
- * - kbitcoiin                    --           grand
- * - mbitcoiin
- * - gbitcoiin
- * - tbitcoiin
+ * - kwei       femtoether     babbage
+ * - mwei       picoether      lovelace
+ * - gwei       nanoether      shannon      nano
+ * - --         microether     szabo        micro
+ * - --         microether     szabo        micro
+ * - --         milliether     finney       milli
+ * - ether      --             --
+ * - kether                    --           grand
+ * - mether
+ * - gether
+ * - tether
  *
- * @method toGen
+ * @method toWei
  * @param {Number|String|BigNumber} number can be a number, number string or a HEX of a decimal
- * @param {String} unit the unit to convert from, default bitcoiin
+ * @param {String} unit the unit to convert from, default ether
  * @return {String|Object} When given a BigNumber object it returns one as well, otherwise a number
 */
-var toGen = function(number, unit) {
+var toWei = function(number, unit) {
     var returnValue = toBigNumber(number).times(getValueOfUnit(unit));
 
     return isBigNumber(number) ? returnValue : returnValue.toString(10);
 };
 
 /**
- * Takes an input and transforms it into an bignumber
+ * Takes an input and transforms it into a bignumber
  *
  * @method toBigNumber
  * @param {Number|String|BigNumber} a number, string, HEX string or BigNumber
@@ -2250,7 +2250,7 @@ var isAddress = function (address) {
         // check if it has the basic requirements of an address
         return false;
     } else if (/^(0x)?[0-9a-f]{40}$/.test(address) || /^(0x)?[0-9A-F]{40}$/.test(address)) {
-        // If it's all small caps or all all caps, return true
+        // If it's all small caps or all caps, return true
         return true;
     } else {
         // Otherwise check each case
@@ -2409,7 +2409,7 @@ var isJson = function (str) {
 };
 
 /**
- * Returns true if given string is a valid Bitcoiin2g block header bloom.
+ * Returns true if given string is a valid Ethereum block header bloom.
  *
  * @method isBloom
  * @param {String} hex encoded bloom filter
@@ -2453,8 +2453,8 @@ module.exports = {
     transformToFullName: transformToFullName,
     extractDisplayName: extractDisplayName,
     extractTypeName: extractTypeName,
-    toGen: toGen,
-    fromGen: fromGen,
+    toWei: toWei,
+    fromWei: fromWei,
     toBigNumber: toBigNumber,
     toTwosComplement: toTwosComplement,
     toAddress: toAddress,
@@ -2575,8 +2575,8 @@ Web3.prototype.fromUtf8 = utils.fromUtf8;
 Web3.prototype.toDecimal = utils.toDecimal;
 Web3.prototype.fromDecimal = utils.fromDecimal;
 Web3.prototype.toBigNumber = utils.toBigNumber;
-Web3.prototype.toGen = utils.toGen;
-Web3.prototype.fromGen = utils.fromGen;
+Web3.prototype.toWei = utils.toWei;
+Web3.prototype.fromWei = utils.fromWei;
 Web3.prototype.isAddress = utils.isAddress;
 Web3.prototype.isChecksumAddress = utils.isChecksumAddress;
 Web3.prototype.toChecksumAddress = utils.toChecksumAddress;
@@ -2609,7 +2609,7 @@ var properties = function () {
             inputFormatter: utils.toDecimal
         }),
         new Property({
-            name: 'version.bitcoiin2g',
+            name: 'version.ethereum',
             getter: 'eth_protocolVersion',
             inputFormatter: utils.toDecimal
         }),
@@ -3239,7 +3239,7 @@ SolidityEvent.prototype.signature = function () {
  * @method encode
  * @param {Object} indexed
  * @param {Object} options
- * @return {Object} everything combined togbitcoiin and encoded
+ * @return {Object} everything combined together and encoded
  */
 SolidityEvent.prototype.encode = function (indexed, options) {
     indexed = indexed || {};
@@ -4496,7 +4496,7 @@ var Iban = function (iban) {
 };
 
 /**
- * This method should be used to create iban object from bitcoiin2g address
+ * This method should be used to create iban object from ethereum address
  *
  * @method fromAddress
  * @param {String} address
@@ -5713,7 +5713,7 @@ module.exports = Personal;
 */
 /** @file shh.js
  * @authors:
- *   Fabian Vogelsteller <fabian@bitcoiin2g.org>
+ *   Fabian Vogelsteller <fabian@ethereum.org>
  *   Marek Kotewicz <marek@ethcore.io>
  * @date 2017
  */
@@ -5862,7 +5862,7 @@ module.exports = Shh;
  * @author Alex Beregszaszi <alex@rtfs.hu>
  * @date 2016
  *
- * Reference: https://github.com/bitcoiinBT2/go-bitcoiin/blob/swarm/internal/web3ext/web3ext.go#L33
+ * Reference: https://git.pirl.io/bitcoiin/go-bitcoiin/blob/swarm/internal/web3ext/web3ext.go#L33
  */
 
 "use strict";
@@ -6317,7 +6317,7 @@ var errors = require('./errors');
 
 /**
  * It's responsible for passing messages to providers
- * It's also responsible for polling the bitcoiin2g node for incoming messages
+ * It's also responsible for polling the ethereum node for incoming messages
  * Default poll timeout is 1 second
  * Singleton
  */
@@ -8408,7 +8408,7 @@ module.exports = transfer;
 	         *
 	         * This method invokes _doProcessBlock(offset), which must be implemented by a concrete subtype.
 	         *
-	         * @param {boolean} doFlush Whbitcoiin all blocks and partial blocks should be processed.
+	         * @param {boolean} doFlush Whether all blocks and partial blocks should be processed.
 	         *
 	         * @return {WordArray} The processed data.
 	         *

@@ -1,18 +1,18 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 // Package flowcontrol implements a client side flow control mechanism
 package flowcontrol
@@ -21,7 +21,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common/mclock"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common/mclock"
 )
 
 const fcTimeConst = time.Millisecond
@@ -82,7 +82,6 @@ func (peer *ClientNode) RequestProcessed(cost uint64) (bv, realCost uint64) {
 	time := mclock.Now()
 	peer.recalcBV(time)
 	peer.bufValue -= cost
-	peer.recalcBV(time)
 	rcValue, rcost := peer.cm.processed(peer.cmNode, time)
 	if rcValue < peer.params.BufLimit {
 		bv := peer.params.BufLimit - rcValue

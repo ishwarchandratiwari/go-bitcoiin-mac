@@ -1,37 +1,40 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package api
 
 import (
+	"bytes"
 	"reflect"
 	"testing"
+
+	"git.pirl.io/bitcoiin/go-bitcoiin/swarm/storage"
 )
 
 func TestParseURI(t *testing.T) {
 	type test struct {
-		uri                       string
-		expectURI                 *URI
-		expectErr                 bool
-		expectRaw                 bool
-		expectImmutable           bool
-		expectList                bool
-		expectHash                bool
-		expectDeprecatedRaw       bool
-		expectDeprecatedImmutable bool
+		uri             string
+		expectURI       *URI
+		expectErr       bool
+		expectRaw       bool
+		expectImmutable bool
+		expectList      bool
+		expectHash      bool
+		expectValidKey  bool
+		expectAddr      storage.Address
 	}
 	tests := []test{
 		{
@@ -120,24 +123,17 @@ func TestParseURI(t *testing.T) {
 			expectList: true,
 		},
 		{
-			uri:                 "bzzr:",
-			expectURI:           &URI{Scheme: "bzzr"},
-			expectDeprecatedRaw: true,
-		},
-		{
-			uri:                 "bzzr:/",
-			expectURI:           &URI{Scheme: "bzzr"},
-			expectDeprecatedRaw: true,
-		},
-		{
-			uri:                       "bzzi:",
-			expectURI:                 &URI{Scheme: "bzzi"},
-			expectDeprecatedImmutable: true,
-		},
-		{
-			uri:                       "bzzi:/",
-			expectURI:                 &URI{Scheme: "bzzi"},
-			expectDeprecatedImmutable: true,
+			uri: "bzz-raw://4378d19c26590f1a818ed7d6a62c3809e149b0999cab5ce5f26233b3b423bf8c",
+			expectURI: &URI{Scheme: "bzz-raw",
+				Addr: "4378d19c26590f1a818ed7d6a62c3809e149b0999cab5ce5f26233b3b423bf8c",
+			},
+			expectValidKey: true,
+			expectRaw:      true,
+			expectAddr: storage.Address{67, 120, 209, 156, 38, 89, 15, 26,
+				129, 142, 215, 214, 166, 44, 56, 9,
+				225, 73, 176, 153, 156, 171, 92, 229,
+				242, 98, 51, 179, 180, 35, 191, 140,
+			},
 		},
 	}
 	for _, x := range tests {
@@ -166,11 +162,14 @@ func TestParseURI(t *testing.T) {
 		if actual.Hash() != x.expectHash {
 			t.Fatalf("expected %s hash to be %t, got %t", x.uri, x.expectHash, actual.Hash())
 		}
-		if actual.DeprecatedRaw() != x.expectDeprecatedRaw {
-			t.Fatalf("expected %s deprecated raw to be %t, got %t", x.uri, x.expectDeprecatedRaw, actual.DeprecatedRaw())
-		}
-		if actual.DeprecatedImmutable() != x.expectDeprecatedImmutable {
-			t.Fatalf("expected %s deprecated immutable to be %t, got %t", x.uri, x.expectDeprecatedImmutable, actual.DeprecatedImmutable())
+		if x.expectValidKey {
+			if actual.Address() == nil {
+				t.Fatalf("expected %s to return a valid key, got nil", x.uri)
+			} else {
+				if !bytes.Equal(x.expectAddr, actual.Address()) {
+					t.Fatalf("expected %s to be decoded to %v", x.expectURI.Addr, x.expectAddr)
+				}
+			}
 		}
 	}
 }

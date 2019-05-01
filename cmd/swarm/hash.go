@@ -1,30 +1,40 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of go-bitcoiin2g.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-bitcoiin2g is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-bitcoiin2g is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-bitcoiin2g. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 // Command bzzhash computes a swarm tree hash.
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/cmd/utils"
-	"github.com/bitcoiinBT2/go-bitcoiin/swarm/storage"
+	"git.pirl.io/bitcoiin/go-bitcoiin/cmd/utils"
+	"git.pirl.io/bitcoiin/go-bitcoiin/swarm/storage"
 	"gopkg.in/urfave/cli.v1"
 )
+
+var hashCommand = cli.Command{
+	Action:             hash,
+	CustomHelpTemplate: helpTemplate,
+	Name:               "hash",
+	Usage:              "print the swarm hash of a file or directory",
+	ArgsUsage:          "<file>",
+	Description:        "Prints the swarm hash of file or directory",
+}
 
 func hash(ctx *cli.Context) {
 	args := ctx.Args()
@@ -38,11 +48,11 @@ func hash(ctx *cli.Context) {
 	defer f.Close()
 
 	stat, _ := f.Stat()
-	chunker := storage.NewTreeChunker(storage.NewChunkerParams())
-	key, err := chunker.Split(f, stat.Size(), nil, nil, nil)
+	fileStore := storage.NewFileStore(&storage.FakeChunkStore{}, storage.NewFileStoreParams())
+	addr, _, err := fileStore.Store(context.TODO(), f, stat.Size(), false)
 	if err != nil {
 		utils.Fatalf("%v\n", err)
 	} else {
-		fmt.Printf("%v\n", key)
+		fmt.Printf("%v\n", addr)
 	}
 }

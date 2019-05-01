@@ -25,7 +25,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
 )
 
 const (

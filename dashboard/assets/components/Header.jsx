@@ -1,20 +1,20 @@
 // @flow
 
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 import React, {Component} from 'react';
 
@@ -25,6 +25,16 @@ import IconButton from 'material-ui/IconButton';
 import Icon from 'material-ui/Icon';
 import MenuIcon from 'material-ui-icons/Menu';
 import Typography from 'material-ui/Typography';
+
+// styles contains the constant styles of the component.
+const styles = {
+	header: {
+		height: '8%',
+	},
+	toolbar: {
+		height: '100%',
+	},
+};
 
 // themeStyles returns the styles generated from the theme for the component.
 const themeStyles = (theme: Object) => ({
@@ -54,15 +64,15 @@ class Header extends Component<Props> {
 		const {classes} = this.props;
 
 		return (
-			<AppBar position='static' className={classes.header}>
-				<Toolbar className={classes.toolbar}>
+			<AppBar position='static' className={classes.header} style={styles.header}>
+				<Toolbar className={classes.toolbar} style={styles.toolbar}>
 					<IconButton onClick={this.props.switchSideBar}>
 						<Icon>
 							<MenuIcon />
 						</Icon>
 					</IconButton>
 					<Typography type='title' color='inherit' noWrap className={classes.title}>
-						Go Bitcoiin2g Dashboard
+						Go Ethereum Dashboard
 					</Typography>
 				</Toolbar>
 			</AppBar>

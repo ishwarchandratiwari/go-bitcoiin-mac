@@ -19,9 +19,9 @@ package types
 import (
 	"bytes"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/rlp"
-	"github.com/bitcoiinBT2/go-bitcoiin/trie"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/rlp"
+	"git.pirl.io/bitcoiin/go-bitcoiin/trie"
 )
 
 type DerivableList interface {

@@ -1,18 +1,18 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package event
 
@@ -232,6 +232,45 @@ func TestFeedUnsubscribeBlockedPost(t *testing.T) {
 	}
 	// Unblock the Sends.
 	bsub.Unsubscribe()
+	wg.Wait()
+}
+
+// Checks that unsubscribing a channel during Send works even if that
+// channel has already been sent on.
+func TestFeedUnsubscribeSentChan(t *testing.T) {
+	var (
+		feed Feed
+		ch1  = make(chan int)
+		ch2  = make(chan int)
+		sub1 = feed.Subscribe(ch1)
+		sub2 = feed.Subscribe(ch2)
+		wg   sync.WaitGroup
+	)
+	defer sub2.Unsubscribe()
+
+	wg.Add(1)
+	go func() {
+		feed.Send(0)
+		wg.Done()
+	}()
+
+	// Wait for the value on ch1.
+	<-ch1
+	// Unsubscribe ch1, removing it from the send cases.
+	sub1.Unsubscribe()
+
+	// Receive ch2, finishing Send.
+	<-ch2
+	wg.Wait()
+
+	// Send again. This should send to ch2 only, so the wait group will unblock
+	// as soon as a value is received on ch2.
+	wg.Add(1)
+	go func() {
+		feed.Send(0)
+		wg.Done()
+	}()
+	<-ch2
 	wg.Wait()
 }
 

@@ -1,52 +1,53 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package api
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"sync"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
-	"github.com/bitcoiinBT2/go-bitcoiin/swarm/storage"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/swarm/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/swarm/storage"
 )
 
 const maxParallelFiles = 5
 
 type FileSystem struct {
-	api *Api
+	api *API
 }
 
-func NewFileSystem(api *Api) *FileSystem {
+func NewFileSystem(api *API) *FileSystem {
 	return &FileSystem{api}
 }
 
 // Upload replicates a local directory as a manifest file and uploads it
-// using dpa store
+// using FileStore store
+// This function waits the chunks to be stored.
 // TODO: localpath should point to a manifest
 //
 // DEPRECATED: Use the HTTP API instead
-func (self *FileSystem) Upload(lpath, index string) (string, error) {
+func (fs *FileSystem) Upload(lpath, index string, toEncrypt bool) (string, error) {
 	var list []*manifestTrieEntry
 	localpath, err := filepath.Abs(filepath.Clean(lpath))
 	if err != nil {
@@ -95,54 +96,58 @@ func (self *FileSystem) Upload(lpath, index string) (string, error) {
 		list = append(list, entry)
 	}
 
-	cnt := len(list)
-	errors := make([]error, cnt)
-	done := make(chan bool, maxParallelFiles)
-	dcnt := 0
-	awg := &sync.WaitGroup{}
+	errors := make([]error, len(list))
+	sem := make(chan bool, maxParallelFiles)
+	defer close(sem)
 
 	for i, entry := range list {
-		if i >= dcnt+maxParallelFiles {
-			<-done
-			dcnt++
-		}
-		awg.Add(1)
-		go func(i int, entry *manifestTrieEntry, done chan bool) {
+		sem <- true
+		go func(i int, entry *manifestTrieEntry) {
+			defer func() { <-sem }()
+
 			f, err := os.Open(entry.Path)
-			if err == nil {
-				stat, _ := f.Stat()
-				var hash storage.Key
-				wg := &sync.WaitGroup{}
-				hash, err = self.api.dpa.Store(f, stat.Size(), wg, nil)
-				if hash != nil {
-					list[i].Hash = hash.String()
-				}
-				wg.Wait()
-				awg.Done()
-				if err == nil {
-					first512 := make([]byte, 512)
-					fread, _ := f.ReadAt(first512, 0)
-					if fread > 0 {
-						mimeType := http.DetectContentType(first512[:fread])
-						if filepath.Ext(entry.Path) == ".css" {
-							mimeType = "text/css"
-						}
-						list[i].ContentType = mimeType
-					}
-				}
-				f.Close()
+			if err != nil {
+				errors[i] = err
+				return
 			}
-			errors[i] = err
-			done <- true
-		}(i, entry, done)
+			defer f.Close()
+
+			stat, err := f.Stat()
+			if err != nil {
+				errors[i] = err
+				return
+			}
+
+			var hash storage.Address
+			var wait func(context.Context) error
+			ctx := context.TODO()
+			hash, wait, err = fs.api.fileStore.Store(ctx, f, stat.Size(), toEncrypt)
+			if err != nil {
+				errors[i] = err
+				return
+			}
+			if hash != nil {
+				list[i].Hash = hash.Hex()
+			}
+			if err := wait(ctx); err != nil {
+				errors[i] = err
+				return
+			}
+
+			list[i].ContentType, err = DetectContentType(f.Name(), f)
+			if err != nil {
+				errors[i] = err
+				return
+			}
+
+		}(i, entry)
 	}
-	for dcnt < cnt {
-		<-done
-		dcnt++
+	for i := 0; i < cap(sem); i++ {
+		sem <- true
 	}
 
 	trie := &manifestTrie{
-		dpa: self.api.dpa,
+		fileStore: fs.api.fileStore,
 	}
 	quitC := make(chan bool)
 	for i, entry := range list {
@@ -163,9 +168,8 @@ func (self *FileSystem) Upload(lpath, index string) (string, error) {
 	err2 := trie.recalcAndStore()
 	var hs string
 	if err2 == nil {
-		hs = trie.hash.String()
+		hs = trie.ref.Hex()
 	}
-	awg.Wait()
 	return hs, err2
 }
 
@@ -173,7 +177,7 @@ func (self *FileSystem) Upload(lpath, index string) (string, error) {
 // under localpath
 //
 // DEPRECATED: Use the HTTP API instead
-func (self *FileSystem) Download(bzzpath, localpath string) error {
+func (fs *FileSystem) Download(bzzpath, localpath string) error {
 	lpath, err := filepath.Abs(filepath.Clean(localpath))
 	if err != nil {
 		return err
@@ -188,7 +192,7 @@ func (self *FileSystem) Download(bzzpath, localpath string) error {
 	if err != nil {
 		return err
 	}
-	key, err := self.api.Resolve(uri)
+	addr, err := fs.api.Resolve(context.TODO(), uri.Addr)
 	if err != nil {
 		return err
 	}
@@ -199,14 +203,14 @@ func (self *FileSystem) Download(bzzpath, localpath string) error {
 	}
 
 	quitC := make(chan bool)
-	trie, err := loadManifest(self.api.dpa, key, quitC)
+	trie, err := loadManifest(context.TODO(), fs.api.fileStore, addr, quitC, NOOPDecrypt)
 	if err != nil {
 		log.Warn(fmt.Sprintf("fs.Download: loadManifestTrie error: %v", err))
 		return err
 	}
 
 	type downloadListEntry struct {
-		key  storage.Key
+		addr storage.Address
 		path string
 	}
 
@@ -217,7 +221,7 @@ func (self *FileSystem) Download(bzzpath, localpath string) error {
 	err = trie.listWithPrefix(path, quitC, func(entry *manifestTrieEntry, suffix string) {
 		log.Trace(fmt.Sprintf("fs.Download: %#v", entry))
 
-		key = common.Hex2Bytes(entry.Hash)
+		addr = common.Hex2Bytes(entry.Hash)
 		path := lpath + "/" + suffix
 		dir := filepath.Dir(path)
 		if dir != prevPath {
@@ -225,7 +229,7 @@ func (self *FileSystem) Download(bzzpath, localpath string) error {
 			prevPath = dir
 		}
 		if (mde == nil) && (path != dir+"/") {
-			list = append(list, &downloadListEntry{key: key, path: path})
+			list = append(list, &downloadListEntry{addr: addr, path: path})
 		}
 	})
 	if err != nil {
@@ -244,7 +248,7 @@ func (self *FileSystem) Download(bzzpath, localpath string) error {
 		}
 		go func(i int, entry *downloadListEntry) {
 			defer wg.Done()
-			err := retrieveToFile(quitC, self.api.dpa, entry.key, entry.path)
+			err := retrieveToFile(quitC, fs.api.fileStore, entry.addr, entry.path)
 			if err != nil {
 				select {
 				case errC <- err:
@@ -267,14 +271,14 @@ func (self *FileSystem) Download(bzzpath, localpath string) error {
 	}
 }
 
-func retrieveToFile(quitC chan bool, dpa *storage.DPA, key storage.Key, path string) error {
+func retrieveToFile(quitC chan bool, fileStore *storage.FileStore, addr storage.Address, path string) error {
 	f, err := os.Create(path) // TODO: basePath separators
 	if err != nil {
 		return err
 	}
-	reader := dpa.Retrieve(key)
+	reader, _ := fileStore.Retrieve(context.TODO(), addr)
 	writer := bufio.NewWriter(f)
-	size, err := reader.Size(quitC)
+	size, err := reader.Size(context.TODO(), quitC)
 	if err != nil {
 		return err
 	}

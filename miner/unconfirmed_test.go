@@ -1,33 +1,36 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package miner
 
 import (
 	"testing"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/core/types"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core/types"
 )
 
-// noopHeaderRetriever is an implementation of headerRetriever that always
+// noopChainRetriever is an implementation of headerRetriever that always
 // returns nil for any requested headers.
-type noopHeaderRetriever struct{}
+type noopChainRetriever struct{}
 
-func (r *noopHeaderRetriever) GetHeaderByNumber(number uint64) *types.Header {
+func (r *noopChainRetriever) GetHeaderByNumber(number uint64) *types.Header {
+	return nil
+}
+func (r *noopChainRetriever) GetBlockByNumber(number uint64) *types.Block {
 	return nil
 }
 
@@ -36,7 +39,7 @@ func (r *noopHeaderRetriever) GetHeaderByNumber(number uint64) *types.Header {
 func TestUnconfirmedInsertBounds(t *testing.T) {
 	limit := uint(10)
 
-	pool := newUnconfirmedBlocks(new(noopHeaderRetriever), limit)
+	pool := newUnconfirmedBlocks(new(noopChainRetriever), limit)
 	for depth := uint64(0); depth < 2*uint64(limit); depth++ {
 		// Insert multiple blocks for the same level just to stress it
 		for i := 0; i < int(depth); i++ {
@@ -58,7 +61,7 @@ func TestUnconfirmedShifts(t *testing.T) {
 	// Create a pool with a few blocks on various depths
 	limit, start := uint(10), uint64(25)
 
-	pool := newUnconfirmedBlocks(new(noopHeaderRetriever), limit)
+	pool := newUnconfirmedBlocks(new(noopChainRetriever), limit)
 	for depth := start; depth < start+uint64(limit); depth++ {
 		pool.Insert(depth, common.Hash([32]byte{byte(depth)}))
 	}

@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of go-bitcoiin2g.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-bitcoiin2g is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-bitcoiin2g is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-bitcoiin2g. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -20,19 +20,19 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io"
+	"math/big"
 	"os"
 	"reflect"
 	"unicode"
 
 	cli "gopkg.in/urfave/cli.v1"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/cmd/utils"
-	"github.com/bitcoiinBT2/go-bitcoiin/dashboard"
-	"github.com/bitcoiinBT2/go-bitcoiin/eth"
-	"github.com/bitcoiinBT2/go-bitcoiin/node"
-	"github.com/bitcoiinBT2/go-bitcoiin/params"
-	whisper "github.com/bitcoiinBT2/go-bitcoiin/whisper/whisperv5"
+	"git.pirl.io/bitcoiin/go-bitcoiin/cmd/utils"
+	"git.pirl.io/bitcoiin/go-bitcoiin/dashboard"
+	"git.pirl.io/bitcoiin/go-bitcoiin/eth"
+	"git.pirl.io/bitcoiin/go-bitcoiin/node"
+	"git.pirl.io/bitcoiin/go-bitcoiin/params"
+	whisper "git.pirl.io/bitcoiin/go-bitcoiin/whisper/whisperv6"
 	"github.com/naoina/toml"
 )
 
@@ -74,7 +74,7 @@ type ethstatsConfig struct {
 	URL string `toml:",omitempty"`
 }
 
-type bitcoiinGoConfig struct {
+type gethConfig struct {
 	Eth       eth.Config
 	Shh       whisper.Config
 	Node      node.Config
@@ -82,7 +82,7 @@ type bitcoiinGoConfig struct {
 	Dashboard dashboard.Config
 }
 
-func loadConfig(file string, cfg *bitcoiinGoConfig) error {
+func loadConfig(file string, cfg *gethConfig) error {
 	f, err := os.Open(file)
 	if err != nil {
 		return err
@@ -103,13 +103,13 @@ func defaultNodeConfig() node.Config {
 	cfg.Version = params.VersionWithCommit(gitCommit)
 	cfg.HTTPModules = append(cfg.HTTPModules, "eth", "shh")
 	cfg.WSModules = append(cfg.WSModules, "eth", "shh")
-	cfg.IPCPath = "bitcoiinGo.ipc"
+	cfg.IPCPath = "pirl.ipc"
 	return cfg
 }
 
-func makeConfigNode(ctx *cli.Context) (*node.Node, bitcoiinGoConfig) {
+func makeConfigNode(ctx *cli.Context) (*node.Node, gethConfig) {
 	// Load defaults.
-	cfg := bitcoiinGoConfig{
+	cfg := gethConfig{
 		Eth:       eth.DefaultConfig,
 		Shh:       whisper.DefaultConfig,
 		Node:      defaultNodeConfig(),
@@ -152,7 +152,9 @@ func enableWhisper(ctx *cli.Context) bool {
 
 func makeFullNode(ctx *cli.Context) *node.Node {
 	stack, cfg := makeConfigNode(ctx)
-
+	if ctx.GlobalIsSet(utils.ConstantinopleOverrideFlag.Name) {
+		cfg.Eth.ConstantinopleOverride = new(big.Int).SetUint64(ctx.GlobalUint64(utils.ConstantinopleOverrideFlag.Name))
+	}
 	utils.RegisterEthService(stack, &cfg.Eth)
 
 	if ctx.GlobalBool(utils.DashboardEnabledFlag.Name) {
@@ -168,10 +170,13 @@ func makeFullNode(ctx *cli.Context) *node.Node {
 		if ctx.GlobalIsSet(utils.WhisperMinPOWFlag.Name) {
 			cfg.Shh.MinimumAcceptedPOW = ctx.Float64(utils.WhisperMinPOWFlag.Name)
 		}
+		if ctx.GlobalIsSet(utils.WhisperRestrictConnectionBetweenLightClientsFlag.Name) {
+			cfg.Shh.RestrictConnectionBetweenLightClients = true
+		}
 		utils.RegisterShhService(stack, &cfg.Shh)
 	}
 
-	// Add the Bitcoiin2g Stats daemon if requested.
+	// Add the Ethereum Stats daemon if requested.
 	if cfg.Ethstats.URL != "" {
 		utils.RegisterEthStatsService(stack, cfg.Ethstats.URL)
 	}
@@ -192,7 +197,17 @@ func dumpConfig(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	io.WriteString(os.Stdout, comment)
-	os.Stdout.Write(out)
+
+	dump := os.Stdout
+	if ctx.NArg() > 0 {
+		dump, err = os.OpenFile(ctx.Args().Get(0), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+		if err != nil {
+			return err
+		}
+		defer dump.Close()
+	}
+	dump.WriteString(comment)
+	dump.Write(out)
+
 	return nil
 }

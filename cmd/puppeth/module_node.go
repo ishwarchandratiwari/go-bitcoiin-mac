@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of go-bitcoiin2g.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-bitcoiin2g is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-bitcoiin2g is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-bitcoiin2g. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -26,13 +26,13 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
 )
 
-// nodeDockerfile is the Dockerfile required to run an Bitcoiin2g node.
+// nodeDockerfile is the Dockerfile required to run an Ethereum node.
 var nodeDockerfile = `
-FROM bitcoiin2g/client-go:latest
+FROM ethereum/client-go:latest
 
 ADD genesis.json /genesis.json
 {{if .Unlock}}
@@ -40,34 +40,36 @@ ADD genesis.json /genesis.json
 	ADD signer.pass /signer.pass
 {{end}}
 RUN \
-  echo 'bitcoiinGo --cache 512 init /genesis.json' > bitcoiinGo.sh && \{{if .Unlock}}
-	echo 'mkdir -p /root/.bitcoiin2g/keystore/ && cp /signer.json /root/.bitcoiin2g/keystore/' >> bitcoiinGo.sh && \{{end}}
-	echo $'bitcoiinGo --networkid {{.NetworkID}} --cache 512 --port {{.Port}} --maxpeers {{.Peers}} {{.LightFlag}} --ethstats \'{{.Ethstats}}\' {{if .Bootnodes}}--bootnodes {{.Bootnodes}}{{end}} {{if .Bitcoiinbase}}--bitcoiinbase {{.Bitcoiinbase}} --mine --minerthreads 1{{end}} {{if .Unlock}}--unlock 0 --password /signer.pass --mine{{end}} --targetgaslimit {{.GasTarget}} --gasprice {{.GasPrice}}' >> bitcoiinGo.sh
+  echo 'geth --cache 512 init /genesis.json' > geth.sh && \{{if .Unlock}}
+	echo 'mkdir -p /root/.ethereum/keystore/ && cp /signer.json /root/.ethereum/keystore/' >> geth.sh && \{{end}}
+	echo $'exec geth --networkid {{.NetworkID}} --cache 512 --port {{.Port}} --nat extip:{{.IP}} --maxpeers {{.Peers}} {{.LightFlag}} --ethstats \'{{.Ethstats}}\' {{if .Bootnodes}}--bootnodes {{.Bootnodes}}{{end}} {{if .Etherbase}}--miner.etherbase {{.Etherbase}} --mine --miner.threads 1{{end}} {{if .Unlock}}--unlock 0 --password /signer.pass --mine{{end}} --miner.gastarget {{.GasTarget}} --miner.gaslimit {{.GasLimit}} --miner.gasprice {{.GasPrice}}' >> geth.sh
 
-ENTRYPOINT ["/bin/sh", "bitcoiinGo.sh"]
+ENTRYPOINT ["/bin/sh", "geth.sh"]
 `
 
 // nodeComposefile is the docker-compose.yml file required to deploy and maintain
-// an Bitcoiin2g node (bootnode or miner for now).
+// an Ethereum node (bootnode or miner for now).
 var nodeComposefile = `
 version: '2'
 services:
   {{.Type}}:
     build: .
     image: {{.Network}}/{{.Type}}
+    container_name: {{.Network}}_{{.Type}}_1
     ports:
       - "{{.Port}}:{{.Port}}"
       - "{{.Port}}:{{.Port}}/udp"
     volumes:
-      - {{.Datadir}}:/root/.bitcoiin2g{{if .Ethashdir}}
+      - {{.Datadir}}:/root/.ethereum{{if .Ethashdir}}
       - {{.Ethashdir}}:/root/.ethash{{end}}
     environment:
       - PORT={{.Port}}/tcp
       - TOTAL_PEERS={{.TotalPeers}}
       - LIGHT_PEERS={{.LightPeers}}
       - STATS_NAME={{.Ethstats}}
-      - MINER_NAME={{.Bitcoiinbase}}
+      - MINER_NAME={{.Etherbase}}
       - GAS_TARGET={{.GasTarget}}
+      - GAS_LIMIT={{.GasLimit}}
       - GAS_PRICE={{.GasPrice}}
     logging:
       driver: "json-file"
@@ -77,12 +79,12 @@ services:
     restart: always
 `
 
-// deployNode deploys a new Bitcoiin2g node container to a remote machine via SSH,
+// deployNode deploys a new Ethereum node container to a remote machine via SSH,
 // docker and docker-compose. If an instance with the specified network name
 // already exists there, it will be overwritten!
 func deployNode(client *sshClient, network string, bootnodes []string, config *nodeInfos, nocache bool) ([]byte, error) {
 	kind := "sealnode"
-	if config.keyJSON == "" && config.bitcoiinbase == "" {
+	if config.keyJSON == "" && config.etherbase == "" {
 		kind = "bootnode"
 		bootnodes = make([]string, 0)
 	}
@@ -98,12 +100,14 @@ func deployNode(client *sshClient, network string, bootnodes []string, config *n
 	template.Must(template.New("").Parse(nodeDockerfile)).Execute(dockerfile, map[string]interface{}{
 		"NetworkID": config.network,
 		"Port":      config.port,
+		"IP":        client.address,
 		"Peers":     config.peersTotal,
 		"LightFlag": lightFlag,
 		"Bootnodes": strings.Join(bootnodes, ","),
 		"Ethstats":  config.ethstats,
-		"Bitcoiinbase": config.bitcoiinbase,
+		"Etherbase": config.etherbase,
 		"GasTarget": uint64(1000000 * config.gasTarget),
+		"GasLimit":  uint64(1000000 * config.gasLimit),
 		"GasPrice":  uint64(1000000000 * config.gasPrice),
 		"Unlock":    config.keyJSON != "",
 	})
@@ -120,8 +124,9 @@ func deployNode(client *sshClient, network string, bootnodes []string, config *n
 		"Light":      config.peersLight > 0,
 		"LightPeers": config.peersLight,
 		"Ethstats":   config.ethstats[:strings.Index(config.ethstats, ":")],
-		"Bitcoiinbase":  config.bitcoiinbase,
+		"Etherbase":  config.etherbase,
 		"GasTarget":  config.gasTarget,
+		"GasLimit":   config.gasLimit,
 		"GasPrice":   config.gasPrice,
 	})
 	files[filepath.Join(workdir, "docker-compose.yaml")] = composefile.Bytes()
@@ -139,9 +144,9 @@ func deployNode(client *sshClient, network string, bootnodes []string, config *n
 
 	// Build and deploy the boot or seal node service
 	if nocache {
-		return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s build --pull --no-cache && docker-compose -p %s up -d --force-recreate", workdir, network, network))
+		return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s build --pull --no-cache && docker-compose -p %s up -d --force-recreate --timeout 60", workdir, network, network))
 	}
-	return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s up -d --build --force-recreate", workdir, network))
+	return nil, client.Stream(fmt.Sprintf("cd %s && docker-compose -p %s up -d --build --force-recreate --timeout 60", workdir, network))
 }
 
 // nodeInfos is returned from a boot or seal node status check to allow reporting
@@ -156,10 +161,11 @@ type nodeInfos struct {
 	enode      string
 	peersTotal int
 	peersLight int
-	bitcoiinbase  string
+	etherbase  string
 	keyJSON    string
 	keyPass    string
 	gasTarget  float64
+	gasLimit   float64
 	gasPrice   float64
 }
 
@@ -175,13 +181,14 @@ func (info *nodeInfos) Report() map[string]string {
 	}
 	if info.gasTarget > 0 {
 		// Miner or signer node
-		report["Gas limit (baseline target)"] = fmt.Sprintf("%0.3f MGas", info.gasTarget)
-		report["Gas price (minimum accepted)"] = fmt.Sprintf("%0.3f GGen", info.gasPrice)
+		report["Gas price (minimum accepted)"] = fmt.Sprintf("%0.3f GWei", info.gasPrice)
+		report["Gas floor (baseline target)"] = fmt.Sprintf("%0.3f MGas", info.gasTarget)
+		report["Gas ceil  (target maximum)"] = fmt.Sprintf("%0.3f MGas", info.gasLimit)
 
-		if info.bitcoiinbase != "" {
+		if info.etherbase != "" {
 			// Ethash proof-of-work miner
 			report["Ethash directory"] = info.ethashdir
-			report["Miner account"] = info.bitcoiinbase
+			report["Miner account"] = info.etherbase
 		}
 		if info.keyJSON != "" {
 			// Clique proof-of-authority signer
@@ -198,8 +205,8 @@ func (info *nodeInfos) Report() map[string]string {
 	return report
 }
 
-// checkNode does a health-check against an boot or seal node server to verify
-// whbitcoiin it's running, and if yes, whbitcoiin it's responsive.
+// checkNode does a health-check against a boot or seal node server to verify
+// whether it's running, and if yes, whether it's responsive.
 func checkNode(client *sshClient, network string, boot bool) (*nodeInfos, error) {
 	kind := "bootnode"
 	if !boot {
@@ -217,14 +224,15 @@ func checkNode(client *sshClient, network string, boot bool) (*nodeInfos, error)
 	totalPeers, _ := strconv.Atoi(infos.envvars["TOTAL_PEERS"])
 	lightPeers, _ := strconv.Atoi(infos.envvars["LIGHT_PEERS"])
 	gasTarget, _ := strconv.ParseFloat(infos.envvars["GAS_TARGET"], 64)
+	gasLimit, _ := strconv.ParseFloat(infos.envvars["GAS_LIMIT"], 64)
 	gasPrice, _ := strconv.ParseFloat(infos.envvars["GAS_PRICE"], 64)
 
 	// Container available, retrieve its node ID and its genesis json
 	var out []byte
-	if out, err = client.Run(fmt.Sprintf("docker exec %s_%s_1 bitcoiinGo --exec admin.nodeInfo.id attach", network, kind)); err != nil {
+	if out, err = client.Run(fmt.Sprintf("docker exec %s_%s_1 geth --exec admin.nodeInfo.enode --cache=16 attach", network, kind)); err != nil {
 		return nil, ErrServiceUnreachable
 	}
-	id := bytes.Trim(bytes.TrimSpace(out), "\"")
+	enode := bytes.Trim(bytes.TrimSpace(out), "\"")
 
 	if out, err = client.Run(fmt.Sprintf("docker exec %s_%s_1 cat /genesis.json", network, kind)); err != nil {
 		return nil, ErrServiceUnreachable
@@ -246,19 +254,20 @@ func checkNode(client *sshClient, network string, boot bool) (*nodeInfos, error)
 	// Assemble and return the useful infos
 	stats := &nodeInfos{
 		genesis:    genesis,
-		datadir:    infos.volumes["/root/.bitcoiin2g"],
+		datadir:    infos.volumes["/root/.ethereum"],
 		ethashdir:  infos.volumes["/root/.ethash"],
 		port:       port,
 		peersTotal: totalPeers,
 		peersLight: lightPeers,
 		ethstats:   infos.envvars["STATS_NAME"],
-		bitcoiinbase:  infos.envvars["MINER_NAME"],
+		etherbase:  infos.envvars["MINER_NAME"],
 		keyJSON:    keyJSON,
 		keyPass:    keyPass,
 		gasTarget:  gasTarget,
+		gasLimit:   gasLimit,
 		gasPrice:   gasPrice,
 	}
-	stats.enode = fmt.Sprintf("enode://%s@%s:%d", id, client.address, stats.port)
+	stats.enode = string(enode)
 
 	return stats, nil
 }

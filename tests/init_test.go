@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package tests
 
@@ -25,11 +25,12 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"runtime"
 	"sort"
 	"strings"
 	"testing"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/params"
+	"git.pirl.io/bitcoiin/go-bitcoiin/params"
 )
 
 var (
@@ -42,7 +43,7 @@ var (
 	difficultyTestDir  = filepath.Join(baseDir, "BasicTests")
 )
 
-func readJson(reader io.Reader, value interface{}) error {
+func readJSON(reader io.Reader, value interface{}) error {
 	data, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return fmt.Errorf("error reading JSON file: %v", err)
@@ -57,14 +58,14 @@ func readJson(reader io.Reader, value interface{}) error {
 	return nil
 }
 
-func readJsonFile(fn string, value interface{}) error {
+func readJSONFile(fn string, value interface{}) error {
 	file, err := os.Open(fn)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	err = readJson(file, value)
+	err = readJSON(file, value)
 	if err != nil {
 		return fmt.Errorf("%s in file %s", err.Error(), fn)
 	}
@@ -90,7 +91,8 @@ type testMatcher struct {
 	configpat    []testConfig
 	failpat      []testFailure
 	skiploadpat  []*regexp.Regexp
-	skipshortpat []*regexp.Regexp
+	slowpat      []*regexp.Regexp
+	whitelistpat *regexp.Regexp
 }
 
 type testConfig struct {
@@ -104,8 +106,8 @@ type testFailure struct {
 }
 
 // skipShortMode skips tests matching when the -short flag is used.
-func (tm *testMatcher) skipShortMode(pattern string) {
-	tm.skipshortpat = append(tm.skipshortpat, regexp.MustCompile(pattern))
+func (tm *testMatcher) slow(pattern string) {
+	tm.slowpat = append(tm.slowpat, regexp.MustCompile(pattern))
 }
 
 // skipLoad skips JSON loading of tests matching the pattern.
@@ -121,6 +123,10 @@ func (tm *testMatcher) fails(pattern string, reason string) {
 	tm.failpat = append(tm.failpat, testFailure{regexp.MustCompile(pattern), reason})
 }
 
+func (tm *testMatcher) whitelist(pattern string) {
+	tm.whitelistpat = regexp.MustCompile(pattern)
+}
+
 // config defines chain config for tests matching the pattern.
 func (tm *testMatcher) config(pattern string, cfg params.ChainConfig) {
 	tm.configpat = append(tm.configpat, testConfig{regexp.MustCompile(pattern), cfg})
@@ -128,10 +134,14 @@ func (tm *testMatcher) config(pattern string, cfg params.ChainConfig) {
 
 // findSkip matches name against test skip patterns.
 func (tm *testMatcher) findSkip(name string) (reason string, skipload bool) {
-	if testing.Short() {
-		for _, re := range tm.skipshortpat {
-			if re.MatchString(name) {
+	isWin32 := runtime.GOARCH == "386" && runtime.GOOS == "windows"
+	for _, re := range tm.slowpat {
+		if re.MatchString(name) {
+			if testing.Short() {
 				return "skipped in -short mode", false
+			}
+			if isWin32 {
+				return "skipped on 32bit windows", false
 			}
 		}
 	}
@@ -169,9 +179,8 @@ func (tm *testMatcher) checkFailure(t *testing.T, name string, err error) error 
 		if err != nil {
 			t.Logf("error: %v", err)
 			return nil
-		} else {
-			return fmt.Errorf("test succeeded unexpectedly")
 		}
+		return fmt.Errorf("test succeeded unexpectedly")
 	}
 	return err
 }
@@ -209,11 +218,16 @@ func (tm *testMatcher) runTestFile(t *testing.T, path, name string, runTest inte
 	if r, _ := tm.findSkip(name); r != "" {
 		t.Skip(r)
 	}
+	if tm.whitelistpat != nil {
+		if !tm.whitelistpat.MatchString(name) {
+			t.Skip("Skipped by whitelist")
+		}
+	}
 	t.Parallel()
 
 	// Load the file as map[string]<testType>.
 	m := makeMapFromTestFunc(runTest)
-	if err := readJsonFile(path, m.Addr().Interface()); err != nil {
+	if err := readJSONFile(path, m.Addr().Interface()); err != nil {
 		t.Fatal(err)
 	}
 

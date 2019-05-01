@@ -1,28 +1,26 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package storage
 
-// this is a clone of an earlier state of the bitcoiin2g ethdb/database
+// this is a clone of an earlier state of the ethereum ethdb/database
 // no need for queueing/caching
 
 import (
-	"fmt"
-
-	"github.com/bitcoiinBT2/go-bitcoiin/compression/rle"
+	"git.pirl.io/bitcoiin/go-bitcoiin/metrics"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/iterator"
 	"github.com/syndtr/goleveldb/leveldb/opt"
@@ -31,8 +29,7 @@ import (
 const openFileLimit = 128
 
 type LDBDatabase struct {
-	db   *leveldb.DB
-	comp bool
+	db *leveldb.DB
 }
 
 func NewLDBDatabase(file string) (*LDBDatabase, error) {
@@ -42,58 +39,44 @@ func NewLDBDatabase(file string) (*LDBDatabase, error) {
 		return nil, err
 	}
 
-	database := &LDBDatabase{db: db, comp: false}
+	database := &LDBDatabase{db: db}
 
 	return database, nil
 }
 
-func (self *LDBDatabase) Put(key []byte, value []byte) {
-	if self.comp {
-		value = rle.Compress(value)
-	}
+func (db *LDBDatabase) Put(key []byte, value []byte) error {
+	metrics.GetOrRegisterCounter("ldbdatabase.put", nil).Inc(1)
 
-	err := self.db.Put(key, value, nil)
-	if err != nil {
-		fmt.Println("Error put", err)
-	}
+	return db.db.Put(key, value, nil)
 }
 
-func (self *LDBDatabase) Get(key []byte) ([]byte, error) {
-	dat, err := self.db.Get(key, nil)
+func (db *LDBDatabase) Get(key []byte) ([]byte, error) {
+	metrics.GetOrRegisterCounter("ldbdatabase.get", nil).Inc(1)
+
+	dat, err := db.db.Get(key, nil)
 	if err != nil {
 		return nil, err
 	}
-
-	if self.comp {
-		return rle.Decompress(dat)
-	}
-
 	return dat, nil
 }
 
-func (self *LDBDatabase) Delete(key []byte) error {
-	return self.db.Delete(key, nil)
+func (db *LDBDatabase) Delete(key []byte) error {
+	return db.db.Delete(key, nil)
 }
 
-func (self *LDBDatabase) LastKnownTD() []byte {
-	data, _ := self.Get([]byte("LTD"))
+func (db *LDBDatabase) NewIterator() iterator.Iterator {
+	metrics.GetOrRegisterCounter("ldbdatabase.newiterator", nil).Inc(1)
 
-	if len(data) == 0 {
-		data = []byte{0x0}
-	}
-
-	return data
+	return db.db.NewIterator(nil, nil)
 }
 
-func (self *LDBDatabase) NewIterator() iterator.Iterator {
-	return self.db.NewIterator(nil, nil)
+func (db *LDBDatabase) Write(batch *leveldb.Batch) error {
+	metrics.GetOrRegisterCounter("ldbdatabase.write", nil).Inc(1)
+
+	return db.db.Write(batch, nil)
 }
 
-func (self *LDBDatabase) Write(batch *leveldb.Batch) error {
-	return self.db.Write(batch, nil)
-}
-
-func (self *LDBDatabase) Close() {
+func (db *LDBDatabase) Close() {
 	// Close the leveldb database
-	self.db.Close()
+	db.db.Close()
 }

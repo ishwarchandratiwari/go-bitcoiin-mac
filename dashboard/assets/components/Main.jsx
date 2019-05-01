@@ -1,26 +1,27 @@
 // @flow
 
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 import React, {Component} from 'react';
 
 import withStyles from 'material-ui/styles/withStyles';
 
 import {MENU} from '../common';
+import Logs from './Logs';
 import Footer from './Footer';
 import type {Content} from '../types/content';
 
@@ -32,7 +33,7 @@ const styles = {
 		width:         '100%',
 	},
 	content: {
-		flex:     1,
+		flex:      1,
 		overflow: 'auto',
 	},
 };
@@ -46,14 +47,40 @@ const themeStyles = theme => ({
 });
 
 export type Props = {
-	classes: Object,
-	active: string,
-	content: Content,
+	classes:      Object,
+	active:       string,
+	content:      Content,
 	shouldUpdate: Object,
+	send:         string => void,
 };
 
 // Main renders the chosen content.
 class Main extends Component<Props> {
+	constructor(props) {
+		super(props);
+		this.container = React.createRef();
+		this.content = React.createRef();
+	}
+
+	getSnapshotBeforeUpdate() {
+		if (this.content && typeof this.content.beforeUpdate === 'function') {
+			return this.content.beforeUpdate();
+		}
+		return null;
+	}
+
+	componentDidUpdate(prevProps, prevState, snapshot) {
+		if (this.content && typeof this.content.didUpdate === 'function') {
+			this.content.didUpdate(prevProps, prevState, snapshot);
+		}
+	}
+
+	onScroll = () => {
+		if (this.content && typeof this.content.onScroll === 'function') {
+			this.content.onScroll();
+		}
+	};
+
 	render() {
 		const {
 			classes, active, content, shouldUpdate,
@@ -69,12 +96,27 @@ class Main extends Component<Props> {
 			children = <div>Work in progress.</div>;
 			break;
 		case MENU.get('logs').id:
-			children = <div>{content.logs.log.map((log, index) => <div key={index}>{log}</div>)}</div>;
+			children = (
+				<Logs
+					ref={(ref) => { this.content = ref; }}
+					container={this.container}
+					send={this.props.send}
+					content={this.props.content}
+					shouldUpdate={shouldUpdate}
+				/>
+			);
 		}
 
 		return (
 			<div style={styles.wrapper}>
-				<div className={classes.content} style={styles.content}>{children}</div>
+				<div
+					className={classes.content}
+					style={styles.content}
+					ref={(ref) => { this.container = ref; }}
+					onScroll={this.onScroll}
+				>
+					{children}
+				</div>
 				<Footer
 					general={content.general}
 					system={content.system}

@@ -1,18 +1,18 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of go-bitcoiin2g.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-bitcoiin2g is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-bitcoiin2g is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-bitcoiin2g. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -20,14 +20,14 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	// "path/filepath"
+	"path/filepath"
 	"strings"
 	"syscall"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/cmd/utils"
-	"github.com/bitcoiinBT2/go-bitcoiin/console"
-	"github.com/bitcoiinBT2/go-bitcoiin/node"
-	"github.com/bitcoiinBT2/go-bitcoiin/rpc"
+	"git.pirl.io/bitcoiin/go-bitcoiin/cmd/utils"
+	"git.pirl.io/bitcoiin/go-bitcoiin/console"
+	"git.pirl.io/bitcoiin/go-bitcoiin/node"
+	"git.pirl.io/bitcoiin/go-bitcoiin/rpc"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -41,9 +41,9 @@ var (
 		Flags:    append(append(append(nodeFlags, rpcFlags...), consoleFlags...), whisperFlags...),
 		Category: "CONSOLE COMMANDS",
 		Description: `
-The BitcoiinGo console is an interactive shell for the JavaScript runtime environment
+The Geth console is an interactive shell for the JavaScript runtime environment
 which exposes a node admin interface as well as the Ðapp JavaScript API.
-See https://github.com/bitcoiinBT2/go-bitcoiin/wiki/JavaScript-Console.`,
+See https://git.pirl.io/bitcoiin/go-bitcoiin/wiki/JavaScript-Console.`,
 	}
 
 	attachCommand = cli.Command{
@@ -51,13 +51,13 @@ See https://github.com/bitcoiinBT2/go-bitcoiin/wiki/JavaScript-Console.`,
 		Name:      "attach",
 		Usage:     "Start an interactive JavaScript environment (connect to node)",
 		ArgsUsage: "[endpoint]",
-		Flags:     consoleFlags,
+		Flags:     append(consoleFlags, utils.DataDirFlag),
 		Category:  "CONSOLE COMMANDS",
 		Description: `
-The BitcoiinGo console is an interactive shell for the JavaScript runtime environment
+The Geth console is an interactive shell for the JavaScript runtime environment
 which exposes a node admin interface as well as the Ðapp JavaScript API.
-See https://github.com/bitcoiinBT2/go-bitcoiin/wiki/JavaScript-Console.
-This command allows to open a console on a running bitcoiinGo node.`,
+See https://git.pirl.io/bitcoiin/go-bitcoiin/wiki/JavaScript-Console.
+This command allows to open a console on a running geth node.`,
 	}
 
 	javascriptCommand = cli.Command{
@@ -69,11 +69,11 @@ This command allows to open a console on a running bitcoiinGo node.`,
 		Category:  "CONSOLE COMMANDS",
 		Description: `
 The JavaScript VM exposes a node admin interface as well as the Ðapp
-JavaScript API. See https://github.com/bitcoiinBT2/go-bitcoiin/wiki/JavaScript-Console`,
+JavaScript API. See https://git.pirl.io/bitcoiin/go-bitcoiin/wiki/JavaScript-Console`,
 	}
 )
 
-// localConsole starts a new bitcoiinGo node, attaching a JavaScript console to it at the
+// localConsole starts a new geth node, attaching a JavaScript console to it at the
 // same time.
 func localConsole(ctx *cli.Context) error {
 	// Create and start the node based on the CLI flags
@@ -84,7 +84,7 @@ func localConsole(ctx *cli.Context) error {
 	// Attach to the newly started node and start the JavaScript console
 	client, err := node.Attach()
 	if err != nil {
-		utils.Fatalf("Failed to attach to the inproc bitcoiinGo: %v", err)
+		utils.Fatalf("Failed to attach to the inproc geth: %v", err)
 	}
 	config := console.Config{
 		DataDir: utils.MakeDataDir(ctx),
@@ -111,10 +111,10 @@ func localConsole(ctx *cli.Context) error {
 	return nil
 }
 
-// remoteConsole will connect to a remote bitcoiinGo instance, attaching a JavaScript
+// remoteConsole will connect to a remote geth instance, attaching a JavaScript
 // console to it.
 func remoteConsole(ctx *cli.Context) error {
-	// Attach to a remotely running bitcoiinGo instance and start the JavaScript console
+	// Attach to a remotely running geth instance and start the JavaScript console
 	endpoint := ctx.Args().First()
 	if endpoint == "" {
 		path := node.DefaultDataDir()
@@ -122,18 +122,17 @@ func remoteConsole(ctx *cli.Context) error {
 			path = ctx.GlobalString(utils.DataDirFlag.Name)
 		}
 		if path != "" {
-			// if ctx.GlobalBool(utils.TestnetFlag.Name) {
-			// 	path = filepath.Join(path, "testnet")
-			// } 
-			// else if ctx.GlobalBool(utils.RinkebyFlag.Name) {
-			// 	path = filepath.Join(path, "rinkeby")
-			// }
+			if ctx.GlobalBool(utils.TestnetFlag.Name) {
+				path = filepath.Join(path, "testnet")
+			} else if ctx.GlobalBool(utils.RinkebyFlag.Name) {
+				path = filepath.Join(path, "rinkeby")
+			}
 		}
-		endpoint = fmt.Sprintf("%s/bitcoiinGo.ipc", path)
+		endpoint = fmt.Sprintf("%s/pirl.ipc", path)
 	}
 	client, err := dialRPC(endpoint)
 	if err != nil {
-		utils.Fatalf("Unable to attach to remote bitcoiinGo: %v", err)
+		utils.Fatalf("Unable to attach to remote geth: %v", err)
 	}
 	config := console.Config{
 		DataDir: utils.MakeDataDir(ctx),
@@ -162,19 +161,19 @@ func remoteConsole(ctx *cli.Context) error {
 
 // dialRPC returns a RPC client which connects to the given endpoint.
 // The check for empty endpoint implements the defaulting logic
-// for "bitcoiinGo attach" and "bitcoiinGo monitor" with no argument.
+// for "geth attach" and "geth monitor" with no argument.
 func dialRPC(endpoint string) (*rpc.Client, error) {
 	if endpoint == "" {
 		endpoint = node.DefaultIPCEndpoint(clientIdentifier)
 	} else if strings.HasPrefix(endpoint, "rpc:") || strings.HasPrefix(endpoint, "ipc:") {
-		// Backwards compatibility with bitcoiinGo < 1.5 which required
+		// Backwards compatibility with geth < 1.5 which required
 		// these prefixes.
 		endpoint = endpoint[4:]
 	}
 	return rpc.Dial(endpoint)
 }
 
-// ephemeralConsole starts a new bitcoiinGo node, attaches an ephemeral JavaScript
+// ephemeralConsole starts a new geth node, attaches an ephemeral JavaScript
 // console to it, executes each of the files specified as arguments and tears
 // everything down.
 func ephemeralConsole(ctx *cli.Context) error {
@@ -186,7 +185,7 @@ func ephemeralConsole(ctx *cli.Context) error {
 	// Attach to the newly started node and start the JavaScript console
 	client, err := node.Attach()
 	if err != nil {
-		utils.Fatalf("Failed to attach to the inproc bitcoiinGo: %v", err)
+		utils.Fatalf("Failed to attach to the inproc geth: %v", err)
 	}
 	config := console.Config{
 		DataDir: utils.MakeDataDir(ctx),

@@ -2,13 +2,16 @@ package core
 
 import (
 	"errors"
-	"github.com/bitcoiinBT2/go-bitcoiin/core/types"
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
-	"github.com/bitcoiinBT2/go-bitcoiin/params"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core/types"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/params"
 	"sort"
 )
 
 var syncStatus bool
+//var maxReorgValue = 5
+//var maxChangedHashes = 3
+
 func (bc *BlockChain) checkChainForAttack(blocks types.Blocks) error {
 	// Copyright 2014 The go-ethereum Authors
 	// Copyright 2018 Pirl Sprl
@@ -44,15 +47,37 @@ func (bc *BlockChain) checkChainForAttack(blocks types.Blocks) error {
 			syncStatus = false
 		}
 	}
+	//counter := 0
 
-
-	if len(blocks) > 0 && bc.CurrentBlock().NumberU64() > uint64(params.ActivationBlock) {
-		if syncStatus && len(blocks) > int(params.PenatlyCheckLenght) {
+	if len(blocks) > 0 && bc.CurrentBlock().NumberU64() > uint64(params.PirlGuardActivationBlock) {
+		//if syncStatus && len(blocks) < int(params.PirlGuardBlockLength) && len(blocks) > maxReorgValue {
+		//	//fmt.Println("We are in the condition here to check smaller block sizes...")
+		//	for _, b := range blocks {
+		//		//fmt.Println("This is the tx hash from incoming block : ",b.NumberU64()," with hash : " , b.Header().Hash().String())
+		//		block := bc.GetBlockByNumber(b.NumberU64())
+		//		if block != nil {
+		//			//fmt.Println("This is the tx hash from db block : ",block.NumberU64()," with hash : " , block.Header().Hash().String())
+		//			if b.Header().Hash().String() != block.Header().Hash().String() {
+		//				counter++
+		//				//fmt.Println("block tx hashes dont match for block : ", block.NumberU64())
+		//			}
+		//		} else {
+		//			fmt.Println("block not found in db : ", b.NumberU64())
+		//		}
+		//		fmt.Println("Matching blocks with changed hashes : ", counter)
+		//	}
+		//	if counter > maxChangedHashes {
+		//		fmt.Println("big reorg detected")
+		//		return ErrBigReorg
+		//	}
+		//}
+		if syncStatus && len(blocks) >= int(params.PirlGuardBlockLength) {
 			for _, b := range blocks {
 				timeMap[b.NumberU64()] = calculatePenaltyTimeForBlock(tipOfTheMainChain, b.NumberU64())
 			}
 		}
 	}
+
 	p := make(PairList, len(timeMap))
 	index := 0
 	for k, v := range timeMap {
@@ -73,7 +98,7 @@ func (bc *BlockChain) checkChainForAttack(blocks types.Blocks) error {
 	}
 	//fmt.Println("Penalty value for the chain :", penalty)
 	context := []interface{}{
-		"synced", syncStatus, "number", tipOfTheMainChain, "incoming_number", blocks[0].NumberU64() - 1, "penalty", penalty ,"implementation", "The Pirl Team ---> https://pirl.io ",
+		"synced", syncStatus, "number", tipOfTheMainChain, "incoming_number", blocks[0].NumberU64() - 1, "penalty", penalty ,"implementation", "The Pirl Team",
 	}
 
 	log.Info("checking legitimity of the chain", context... )
@@ -83,7 +108,7 @@ func (bc *BlockChain) checkChainForAttack(blocks types.Blocks) error {
 			"penalty", penalty,
 		}
 		log.Error("Chain is a malicious and we should reject it", context... )
-		err = ErrPenaltyInChain
+		err = ErrDelayTooHigh
 
 	}
 

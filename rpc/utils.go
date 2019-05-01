@@ -1,18 +1,18 @@
-// Copyright 2015 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package rpc
 
@@ -22,7 +22,6 @@ import (
 	crand "crypto/rand"
 	"encoding/binary"
 	"encoding/hex"
-	"math/big"
 	"math/rand"
 	"reflect"
 	"strings"
@@ -103,20 +102,6 @@ func formatName(name string) string {
 		ret[0] = unicode.ToLower(ret[0])
 	}
 	return string(ret)
-}
-
-var bigIntType = reflect.TypeOf((*big.Int)(nil)).Elem()
-
-// Indication if this type should be serialized in hex
-func isHexNum(t reflect.Type) bool {
-	if t == nil {
-		return false
-	}
-	for t.Kind() == reflect.Ptr {
-		t = t.Elem()
-	}
-
-	return t == bigIntType
 }
 
 // suitableCallbacks iterates over the methods of the given type. It will determine if a method satisfies the criteria

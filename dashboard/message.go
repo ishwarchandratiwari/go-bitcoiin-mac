@@ -1,22 +1,25 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package dashboard
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Message struct {
 	General *GeneralMessage `json:"general,omitempty"`
@@ -67,6 +70,24 @@ type SystemMessage struct {
 	DiskWrite      ChartEntries `json:"diskWrite,omitempty"`
 }
 
+// LogsMessage wraps up a log chunk. If Source isn't present, the chunk is a stream chunk.
 type LogsMessage struct {
-	Log []string `json:"log,omitempty"`
+	Source *LogFile        `json:"source,omitempty"` // Attributes of the log file.
+	Chunk  json.RawMessage `json:"chunk"`            // Contains log records.
+}
+
+// LogFile contains the attributes of a log file.
+type LogFile struct {
+	Name string `json:"name"` // The name of the file.
+	Last bool   `json:"last"` // Denotes if the actual log file is the last one in the directory.
+}
+
+// Request represents the client request.
+type Request struct {
+	Logs *LogsRequest `json:"logs,omitempty"`
+}
+
+type LogsRequest struct {
+	Name string `json:"name"` // The request handler searches for log file based on this file name.
+	Past bool   `json:"past"` // Denotes whether the client wants the previous or the next file.
 }

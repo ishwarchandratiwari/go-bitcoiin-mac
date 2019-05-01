@@ -1,18 +1,18 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package whisperv6
 
@@ -22,8 +22,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/crypto"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/crypto"
 )
 
 var seed int64
@@ -56,7 +56,7 @@ func generateFilter(t *testing.T, symmetric bool) (*Filter, error) {
 	f.Topics = make([][]byte, topicNum)
 	for i := 0; i < topicNum; i++ {
 		f.Topics[i] = make([]byte, 4)
-		mrand.Read(f.Topics[i][:])
+		mrand.Read(f.Topics[i])
 		f.Topics[i][0] = 0x01
 	}
 
@@ -827,41 +827,5 @@ func TestVariableTopics(t *testing.T) {
 			// topic mismatch should have no affect, as topics are handled by topic matchers
 			t.Fatalf("MatchEnvelope symmetric with seed %d, step %d.", seed, i)
 		}
-	}
-}
-
-func TestMatchSingleTopic_ReturnTrue(t *testing.T) {
-	bt := []byte("test")
-	topic := BytesToTopic(bt)
-
-	if !matchSingleTopic(topic, bt) {
-		t.FailNow()
-	}
-}
-
-func TestMatchSingleTopic_WithTail_ReturnTrue(t *testing.T) {
-	bt := []byte("test with tail")
-	topic := BytesToTopic([]byte("test"))
-
-	if !matchSingleTopic(topic, bt) {
-		t.FailNow()
-	}
-}
-
-func TestMatchSingleTopic_NotEquals_ReturnFalse(t *testing.T) {
-	bt := []byte("tes")
-	topic := BytesToTopic(bt)
-
-	if matchSingleTopic(topic, bt) {
-		t.FailNow()
-	}
-}
-
-func TestMatchSingleTopic_InsufficientLength_ReturnFalse(t *testing.T) {
-	bt := []byte("test")
-	topic := BytesToTopic([]byte("not_equal"))
-
-	if matchSingleTopic(topic, bt) {
-		t.FailNow()
 	}
 }

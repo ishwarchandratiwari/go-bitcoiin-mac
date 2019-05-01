@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package usbwallet
 
@@ -22,9 +22,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/accounts"
-	"github.com/bitcoiinBT2/go-bitcoiin/event"
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/accounts"
+	"git.pirl.io/bitcoiin/go-bitcoiin/event"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
 	"github.com/karalabe/hid"
 )
 
@@ -127,7 +127,7 @@ func (hub *Hub) refreshWallets() {
 		// breaking the Ledger protocol if that is waiting for user confirmation. This
 		// is a bug acknowledged at Ledger, but it won't be fixed on old devices so we
 		// need to prevent concurrent comms ourselves. The more elegant solution would
-		// be to ditch enumeration in favor of hutplug events, but that don't work yet
+		// be to ditch enumeration in favor of hotplug events, but that don't work yet
 		// on Windows so if we need to hack it anyway, this is more elegant for now.
 		hub.commsLock.Lock()
 		if hub.commsPend > 0 { // A confirmation is pending, don't refresh

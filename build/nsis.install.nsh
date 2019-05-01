@@ -3,9 +3,9 @@ InstallDir "$InstDir"
 OutFile "${OUTPUTFILE}" # set through command line arguments
 
 # Links for "Add/Remove Programs"
-!define HELPURL "https://github.com/bitcoiinBT2/go-bitcoiin/issues"
-!define UPDATEURL "https://github.com/bitcoiinBT2/go-bitcoiin/releases"
-!define ABOUTURL "https://github.com/bitcoiinBT2/go-bitcoiin#bitcoiin2g-go"
+!define HELPURL "https://git.pirl.io/bitcoiin/go-bitcoiin/issues"
+!define UPDATEURL "https://git.pirl.io/bitcoiin/go-bitcoiin/releases"
+!define ABOUTURL "https://git.pirl.io/bitcoiin/go-bitcoiin#ethereum-go"
 !define /date NOW "%Y%m%d"
 
 PageEx license
@@ -13,9 +13,9 @@ PageEx license
 PageExEnd
 
 # Install geth binary
-Section "BitcoiinGo" GETH_IDX
+Section "Geth" GETH_IDX
   SetOutPath $INSTDIR
-  file {{.BitcoiinGo}}
+  file {{.Geth}}
 
   # Create start menu launcher
   createDirectory "$SMPROGRAMS\${APPNAME}"
@@ -24,16 +24,16 @@ Section "BitcoiinGo" GETH_IDX
   createShortCut "$SMPROGRAMS\${APPNAME}\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "" ""
 
   # Firewall - remove rules (if exists)
-  SimpleFC::AdvRemoveRule "BitcoiinGo incoming peers (TCP:30303)"
-  SimpleFC::AdvRemoveRule "BitcoiinGo outgoing peers (TCP:30303)"
-  SimpleFC::AdvRemoveRule "BitcoiinGo UDP discovery (UDP:30303)"
+  SimpleFC::AdvRemoveRule "Geth incoming peers (TCP:30303)"
+  SimpleFC::AdvRemoveRule "Geth outgoing peers (TCP:30303)"
+  SimpleFC::AdvRemoveRule "Geth UDP discovery (UDP:30303)"
 
   # Firewall - add rules
-  SimpleFC::AdvAddRule "BitcoiinGo incoming peers (TCP:30303)" ""  6 1 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "Bitcoiin2g" 30303 "" "" ""
-  SimpleFC::AdvAddRule "BitcoiinGo outgoing peers (TCP:30303)" ""  6 2 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "Bitcoiin2g" "" 30303 "" ""
-  SimpleFC::AdvAddRule "BitcoiinGo UDP discovery (UDP:30303)" "" 17 2 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "Bitcoiin2g" "" 30303 "" ""
+  SimpleFC::AdvAddRule "Geth incoming peers (TCP:30303)" ""  6 1 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "Ethereum" 30303 "" "" ""
+  SimpleFC::AdvAddRule "Geth outgoing peers (TCP:30303)" ""  6 2 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "Ethereum" "" 30303 "" ""
+  SimpleFC::AdvAddRule "Geth UDP discovery (UDP:30303)" "" 17 2 1 2147483647 1 "$INSTDIR\geth.exe" "" "" "Ethereum" "" 30303 "" ""
 
-  # Set default IPC endpoint (https://github.com/bitcoiin2g/EIPs/issues/147)
+  # Set default IPC endpoint (https://github.com/ethereum/EIPs/issues/147)
   ${EnvVarUpdate} $0 "ETHEREUM_SOCKET" "R" "HKLM" "\\.\pipe\geth.ipc"
   ${EnvVarUpdate} $0 "ETHEREUM_SOCKET" "A" "HKLM" "\\.\pipe\geth.ipc"
 

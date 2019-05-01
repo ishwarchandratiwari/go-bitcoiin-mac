@@ -1,22 +1,22 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 /*
 Package hexutil implements hex encoding with 0x prefix.
-This encoding is used by the Bitcoiin2g RPC API to transport binary data in JSON payloads.
+This encoding is used by the Ethereum RPC API to transport binary data in JSON payloads.
 
 Encoding Rules
 
@@ -39,6 +39,7 @@ import (
 
 const uintBits = 32 << (uint64(^uint(0)) >> 63)
 
+// Errors
 var (
 	ErrEmptyString   = &decError{"empty hex string"}
 	ErrSyntax        = &decError{"invalid hex string"}
@@ -120,7 +121,7 @@ func EncodeUint64(i uint64) string {
 var bigWordNibbles int
 
 func init() {
-	// This is a genrd way to compute the number of nibbles required for big.Word.
+	// This is a weird way to compute the number of nibbles required for big.Word.
 	// The usual way would be to use constant arithmetic but go vet can't handle that.
 	b, _ := new(big.Int).SetString("FFFFFFFFFF", 16)
 	switch len(b.Bits()) {
@@ -129,7 +130,7 @@ func init() {
 	case 2:
 		bigWordNibbles = 8
 	default:
-		panic("genrd big.Word size")
+		panic("weird big.Word size")
 	}
 }
 

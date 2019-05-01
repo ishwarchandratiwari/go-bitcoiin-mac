@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of go-bitcoiin2g.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-bitcoiin2g is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-bitcoiin2g is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-bitcoiin2g. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
 )
 
 // manageServers displays a list of servers the user can disconnect from, and an
@@ -62,14 +62,14 @@ func (w *wizard) manageServers() {
 	}
 }
 
-// makeServer reads a single line from stdin and interprets it as a hostname to
-// connect to. It tries to establish a new SSH session and also executing some
-// baseline validations.
+// makeServer reads a single line from stdin and interprets it as
+// username:identity@hostname to connect to. It tries to establish a
+// new SSH session and also executing some baseline validations.
 //
 // If connection succeeds, the server is added to the wizards configs!
 func (w *wizard) makeServer() string {
 	fmt.Println()
-	fmt.Println("Please enter remote server's address:")
+	fmt.Println("What is the remote server's address ([username[:identity]@]hostname[:port])?")
 
 	// Read and dial the server to ensure docker is present
 	input := w.readString()
@@ -87,7 +87,7 @@ func (w *wizard) makeServer() string {
 	return input
 }
 
-// selectServer lists the user all the currnetly known servers to choose from,
+// selectServer lists the user all the currently known servers to choose from,
 // also granting the option to add a new one.
 func (w *wizard) selectServer() string {
 	// List the available server to the user and wait for a choice
@@ -115,7 +115,7 @@ func (w *wizard) selectServer() string {
 // manageComponents displays a list of network components the user can tear down
 // and an option
 func (w *wizard) manageComponents() {
-	// List all the componens we can tear down, along with an entry to deploy a new one
+	// List all the components we can tear down, along with an entry to deploy a new one
 	fmt.Println()
 
 	var serviceHosts, serviceNames []string

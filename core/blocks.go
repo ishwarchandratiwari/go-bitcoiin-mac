@@ -16,7 +16,7 @@
 
 package core
 
-import "github.com/bitcoiinBT2/go-bitcoiin/common"
+import "git.pirl.io/bitcoiin/go-bitcoiin/common"
 
 // BadHashes represent a set of manually tracked bad hashes (usually hard forks)
 var BadHashes = map[common.Hash]bool{

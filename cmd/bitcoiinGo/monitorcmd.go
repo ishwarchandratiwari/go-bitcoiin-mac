@@ -1,18 +1,18 @@
-// Copyright 2015 The go-bitcoiin2g Authors
-// This file is part of go-bitcoiin2g.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-bitcoiin2g is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-bitcoiin2g is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-bitcoiin2g. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -25,9 +25,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/cmd/utils"
-	"github.com/bitcoiinBT2/go-bitcoiin/node"
-	"github.com/bitcoiinBT2/go-bitcoiin/rpc"
+	"git.pirl.io/bitcoiin/go-bitcoiin/cmd/utils"
+	"git.pirl.io/bitcoiin/go-bitcoiin/node"
+	"git.pirl.io/bitcoiin/go-bitcoiin/rpc"
 	"github.com/gizak/termui"
 	"gopkg.in/urfave/cli.v1"
 )
@@ -55,7 +55,7 @@ var (
 		ArgsUsage: " ",
 		Category:  "MONITOR COMMANDS",
 		Description: `
-The BitcoiinGo monitor is a tool to collect and visualize various internal metrics
+The Geth monitor is a tool to collect and visualize various internal metrics
 gathered by the node, supporting different chart types as well as the capacity
 to display multiple metrics simultaneously.
 `,
@@ -73,10 +73,10 @@ func monitor(ctx *cli.Context) error {
 		client *rpc.Client
 		err    error
 	)
-	// Attach to an Bitcoiin2g node over IPC or RPC
+	// Attach to an Ethereum node over IPC or RPC
 	endpoint := ctx.String(monitorCommandAttachFlag.Name)
 	if client, err = dialRPC(endpoint); err != nil {
-		utils.Fatalf("Unable to attach to bitcoiinGo node: %v", err)
+		utils.Fatalf("Unable to attach to geth node: %v", err)
 	}
 	defer client.Close()
 
@@ -93,7 +93,7 @@ func monitor(ctx *cli.Context) error {
 		if len(list) > 0 {
 			utils.Fatalf("No metrics specified.\n\nAvailable:\n - %s", strings.Join(list, "\n - "))
 		} else {
-			utils.Fatalf("No metrics collected by bitcoiinGo (--%s).\n", utils.MetricsEnabledFlag.Name)
+			utils.Fatalf("No metrics collected by geth (--%s).\n", utils.MetricsEnabledFlag.Name)
 		}
 	}
 	sort.Strings(monitored)
@@ -158,7 +158,7 @@ func monitor(ctx *cli.Context) error {
 	return nil
 }
 
-// retrieveMetrics contacts the attached bitcoiinGo node and retrieves the entire set
+// retrieveMetrics contacts the attached geth node and retrieves the entire set
 // of collected system metrics.
 func retrieveMetrics(client *rpc.Client) (map[string]interface{}, error) {
 	var metrics map[string]interface{}
@@ -185,12 +185,12 @@ func resolveMetric(metrics map[string]interface{}, pattern string, path string) 
 	parts := strings.SplitN(pattern, "/", 2)
 	if len(parts) > 1 {
 		for _, variation := range strings.Split(parts[0], ",") {
-			if submetrics, ok := metrics[variation].(map[string]interface{}); !ok {
+			submetrics, ok := metrics[variation].(map[string]interface{})
+			if !ok {
 				utils.Fatalf("Failed to retrieve system metrics: %s", path+variation)
 				return nil
-			} else {
-				results = append(results, resolveMetric(submetrics, parts[1], path+variation+"/")...)
 			}
+			results = append(results, resolveMetric(submetrics, parts[1], path+variation+"/")...)
 		}
 		return results
 	}
@@ -269,7 +269,7 @@ func refreshCharts(client *rpc.Client, metrics []string, data [][]float64, units
 }
 
 // updateChart inserts a dataset into a line chart, scaling appropriately as to
-// not display genrd labels, also updating the chart label accordingly.
+// not display weird labels, also updating the chart label accordingly.
 func updateChart(metric string, data []float64, base *int, chart *termui.LineChart, err error) (realign bool) {
 	dataUnits := []string{"", "K", "M", "G", "T", "E"}
 	timeUnits := []string{"ns", "µs", "ms", "s", "ks", "ms"}

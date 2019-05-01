@@ -1,34 +1,34 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-// Contains all the wrappers from the go-bitcoiin2g root package.
+// Contains all the wrappers from the go-ethereum root package.
 
-package bitcoiinGo
+package geth
 
 import (
 	"errors"
 
-	bitcoiin2g "github.com/bitcoiinBT2/go-bitcoiin"
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
+	ethereum "git.pirl.io/bitcoiin/go-bitcoiin"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
 )
 
 // Subscription represents an event subscription where events are
 // delivered on a data channel.
 type Subscription struct {
-	sub bitcoiin2g.Subscription
+	sub ethereum.Subscription
 }
 
 // Unsubscribe cancels the sending of events to the data channel
@@ -39,7 +39,7 @@ func (s *Subscription) Unsubscribe() {
 
 // CallMsg contains parameters for contract calls.
 type CallMsg struct {
-	msg bitcoiin2g.CallMsg
+	msg ethereum.CallMsg
 }
 
 // NewCallMsg creates an empty contract call parameter list.
@@ -67,14 +67,15 @@ func (msg *CallMsg) SetData(data []byte)       { msg.msg.Data = common.CopyBytes
 func (msg *CallMsg) SetTo(address *Address) {
 	if address == nil {
 		msg.msg.To = nil
+		return
 	}
 	msg.msg.To = &address.address
 }
 
 // SyncProgress gives progress indications when the node is synchronising with
-// the Bitcoiin2g network.
+// the Ethereum network.
 type SyncProgress struct {
-	progress bitcoiin2g.SyncProgress
+	progress ethereum.SyncProgress
 }
 
 func (p *SyncProgress) GetStartingBlock() int64 { return int64(p.progress.StartingBlock) }
@@ -125,12 +126,12 @@ func (t *Topics) Append(topics *Hashes) {
 	t.topics = append(t.topics, topics.hashes)
 }
 
-// FilterQuery contains options for contact log filtering.
+// FilterQuery contains options for contract log filtering.
 type FilterQuery struct {
-	query bitcoiin2g.FilterQuery
+	query ethereum.FilterQuery
 }
 
-// NewFilterQuery creates an empty filter query for contact log filtering.
+// NewFilterQuery creates an empty filter query for contract log filtering.
 func NewFilterQuery() *FilterQuery {
 	return new(FilterQuery)
 }

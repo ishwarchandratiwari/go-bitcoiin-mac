@@ -1,21 +1,21 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 /*
-Package node sets up multi-protocol Bitcoiin2g nodes.
+Package node sets up multi-protocol Ethereum nodes.
 
 In the model exposed by this package, a node is a collection of services which use shared
 resources to provide RPC APIs. Services can also offer devp2p protocols, which are wired
@@ -43,7 +43,7 @@ Service implementations can open LevelDB databases through the service context. 
 node chooses the file system location of each database. If the node is configured to run
 without a data directory, databases are opened in memory instead.
 
-Node also creates the shared store of encrypted Bitcoiin2g account keys. Services can access
+Node also creates the shared store of encrypted Ethereum account keys. Services can access
 the account manager through the service context.
 
 
@@ -59,7 +59,7 @@ using the same data directory will store this information in different subdirect
 the data directory.
 
 LevelDB databases are also stored within the instance subdirectory. If multiple node
-instances use the same data directory, openening the databases with identical names will
+instances use the same data directory, opening the databases with identical names will
 create one database for each instance.
 
 The account key store is shared among all node instances using the same data directory
@@ -69,7 +69,7 @@ unless its location is changed through the KeyStoreDir configuration option.
 Data Directory Sharing Example
 
 In this example, two node instances named A and B are started with the same data
-directory. Mode instance A opens the database "db", node instance B opens the databases
+directory. Node instance A opens the database "db", node instance B opens the databases
 "db" and "db-2". The following files will be created in the data directory:
 
    data-directory/
@@ -84,7 +84,7 @@ directory. Mode instance A opens the database "db", node instance B opens the da
             static-nodes.json  -- devp2p static node list of instance B
             db/                -- LevelDB content for "db"
             db-2/              -- LevelDB content for "db-2"
-        B.ipc                  -- JSON-RPC UNIX domain socket endpoint of instance A
+        B.ipc                  -- JSON-RPC UNIX domain socket endpoint of instance B
         keystore/              -- account key store, used by both instances
 */
 package node

@@ -1,43 +1,64 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package trie
 
 import (
-	"bytes"
 	"hash"
 	"sync"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/crypto/sha3"
-	"github.com/bitcoiinBT2/go-bitcoiin/rlp"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/rlp"
+	"golang.org/x/crypto/sha3"
 )
 
 type hasher struct {
-	tmp        *bytes.Buffer
-	sha        hash.Hash
+	tmp        sliceBuffer
+	sha        keccakState
 	cachegen   uint16
 	cachelimit uint16
 	onleaf     LeafCallback
 }
 
+// keccakState wraps sha3.state. In addition to the usual hash methods, it also supports
+// Read to get a variable amount of data from the hash state. Read is faster than Sum
+// because it doesn't copy the internal state, but also modifies the internal state.
+type keccakState interface {
+	hash.Hash
+	Read([]byte) (int, error)
+}
+
+type sliceBuffer []byte
+
+func (b *sliceBuffer) Write(data []byte) (n int, err error) {
+	*b = append(*b, data...)
+	return len(data), nil
+}
+
+func (b *sliceBuffer) Reset() {
+	*b = (*b)[:0]
+}
+
 // hashers live in a global db.
 var hasherPool = sync.Pool{
 	New: func() interface{} {
-		return &hasher{tmp: new(bytes.Buffer), sha: sha3.NewKeccak256()}
+		return &hasher{
+			tmp: make(sliceBuffer, 0, 550), // cap is as large as a full fullNode.
+			sha: sha3.NewLegacyKeccak256().(keccakState),
+		}
 	},
 }
 
@@ -116,9 +137,6 @@ func (h *hasher) hashChildren(original node, db *Database) (node, node, error) {
 				return original, original, err
 			}
 		}
-		if collapsed.Val == nil {
-			collapsed.Val = valueNode(nil) // Ensure that nil children are encoded as empty strings.
-		}
 		return collapsed, cached, nil
 
 	case *fullNode:
@@ -131,14 +149,9 @@ func (h *hasher) hashChildren(original node, db *Database) (node, node, error) {
 				if err != nil {
 					return original, original, err
 				}
-			} else {
-				collapsed.Children[i] = valueNode(nil) // Ensure that nil children are encoded as empty strings.
 			}
 		}
 		cached.Children[16] = n.Children[16]
-		if collapsed.Children[16] == nil {
-			collapsed.Children[16] = valueNode(nil)
-		}
 		return collapsed, cached, nil
 
 	default:
@@ -157,39 +170,24 @@ func (h *hasher) store(n node, db *Database, force bool) (node, error) {
 	}
 	// Generate the RLP encoding of the node
 	h.tmp.Reset()
-	if err := rlp.Encode(h.tmp, n); err != nil {
+	if err := rlp.Encode(&h.tmp, n); err != nil {
 		panic("encode error: " + err.Error())
 	}
-	if h.tmp.Len() < 32 && !force {
+	if len(h.tmp) < 32 && !force {
 		return n, nil // Nodes smaller than 32 bytes are stored inside their parent
 	}
 	// Larger nodes are replaced by their hash and stored in the database.
 	hash, _ := n.cache()
 	if hash == nil {
-		h.sha.Reset()
-		h.sha.Write(h.tmp.Bytes())
-		hash = hashNode(h.sha.Sum(nil))
+		hash = h.makeHashNode(h.tmp)
 	}
+
 	if db != nil {
 		// We are pooling the trie nodes into an intermediate memory cache
-		db.lock.Lock()
-
 		hash := common.BytesToHash(hash)
-		db.insert(hash, h.tmp.Bytes())
 
-		// Track all direct parent->child node references
-		switch n := n.(type) {
-		case *shortNode:
-			if child, ok := n.Val.(hashNode); ok {
-				db.reference(common.BytesToHash(child), hash)
-			}
-		case *fullNode:
-			for i := 0; i < 16; i++ {
-				if child, ok := n.Children[i].(hashNode); ok {
-					db.reference(common.BytesToHash(child), hash)
-				}
-			}
-		}
+		db.lock.Lock()
+		db.insert(hash, h.tmp, n)
 		db.lock.Unlock()
 
 		// Track external references from account->storage trie
@@ -209,4 +207,12 @@ func (h *hasher) store(n node, db *Database, force bool) (node, error) {
 		}
 	}
 	return hash, nil
+}
+
+func (h *hasher) makeHashNode(data []byte) hashNode {
+	n := make(hashNode, h.sha.Size())
+	h.sha.Reset()
+	h.sha.Write(data)
+	h.sha.Read(n)
+	return n
 }

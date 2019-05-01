@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package cmdtest
 
@@ -27,6 +27,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"syscall"
 	"testing"
 	"text/template"
 	"time"
@@ -50,10 +51,12 @@ type TestCmd struct {
 	stdout *bufio.Reader
 	stdin  io.WriteCloser
 	stderr *testlogger
+	// Err will contain the process exit error or interrupt signal error
+	Err error
 }
 
 // Run exec's the current binary using name as argv[0] which will trigger the
-// reexec init function for that name (e.g. "bitcoiinGo-test" in cmd/bitcoiinGo/run_test.go)
+// reexec init function for that name (e.g. "geth-test" in cmd/geth/run_test.go)
 func (tt *TestCmd) Run(name string, args ...string) {
 	tt.stderr = &testlogger{t: tt.T}
 	tt.cmd = &exec.Cmd{
@@ -77,7 +80,7 @@ func (tt *TestCmd) Run(name string, args ...string) {
 // InputLine writes the given text to the childs stdin.
 // This method can also be called from an expect template, e.g.:
 //
-//     bitcoiinGo.expect(`Passphrase: {{.InputLine "password"}}`)
+//     geth.expect(`Passphrase: {{.InputLine "password"}}`)
 func (tt *TestCmd) InputLine(s string) string {
 	io.WriteString(tt.stdin, s+"\n")
 	return ""
@@ -182,11 +185,25 @@ func (tt *TestCmd) ExpectExit() {
 }
 
 func (tt *TestCmd) WaitExit() {
-	tt.cmd.Wait()
+	tt.Err = tt.cmd.Wait()
 }
 
 func (tt *TestCmd) Interrupt() {
-	tt.cmd.Process.Signal(os.Interrupt)
+	tt.Err = tt.cmd.Process.Signal(os.Interrupt)
+}
+
+// ExitStatus exposes the process' OS exit code
+// It will only return a valid value after the process has finished.
+func (tt *TestCmd) ExitStatus() int {
+	if tt.Err != nil {
+		exitErr := tt.Err.(*exec.ExitError)
+		if exitErr != nil {
+			if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
+				return status.ExitStatus()
+			}
+		}
+	}
+	return 0
 }
 
 // StderrText returns any stderr output written so far.

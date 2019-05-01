@@ -21,7 +21,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/core/types"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core/types"
 )
 
 // Tests that batched bloom bits are correctly rotated from the input bloom

@@ -1,18 +1,18 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package whisperv6
 
@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/crypto"
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/crypto"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
 )
 
 // Filter represents a Whisper message filter
@@ -248,23 +248,6 @@ func (f *Filter) MatchMessage(msg *ReceivedMessage) bool {
 // Topics are not checked here, since this is done by topic matchers.
 func (f *Filter) MatchEnvelope(envelope *Envelope) bool {
 	return f.PoW <= 0 || envelope.pow >= f.PoW
-}
-
-func matchSingleTopic(topic TopicType, bt []byte) bool {
-	if len(bt) > TopicLength {
-		bt = bt[:TopicLength]
-	}
-
-	if len(bt) < TopicLength {
-		return false
-	}
-
-	for j, b := range bt {
-		if topic[j] != b {
-			return false
-		}
-	}
-	return true
 }
 
 // IsPubKeyEqual checks that two public keys are equal

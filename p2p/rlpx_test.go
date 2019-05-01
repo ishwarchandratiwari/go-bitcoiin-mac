@@ -1,23 +1,24 @@
-// Copyright 2015 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2015 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package p2p
 
 import (
 	"bytes"
+	"crypto/ecdsa"
 	"crypto/rand"
 	"errors"
 	"fmt"
@@ -31,11 +32,11 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/bitcoiinBT2/go-bitcoiin/crypto"
-	"github.com/bitcoiinBT2/go-bitcoiin/crypto/ecies"
-	"github.com/bitcoiinBT2/go-bitcoiin/crypto/sha3"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p/discover"
-	"github.com/bitcoiinBT2/go-bitcoiin/rlp"
+	"git.pirl.io/bitcoiin/go-bitcoiin/crypto"
+	"git.pirl.io/bitcoiin/go-bitcoiin/crypto/ecies"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p/simulations/pipes"
+	"git.pirl.io/bitcoiin/go-bitcoiin/rlp"
+	"golang.org/x/crypto/sha3"
 )
 
 func TestSharedSecret(t *testing.T) {
@@ -79,9 +80,9 @@ func TestEncHandshake(t *testing.T) {
 
 func testEncHandshake(token []byte) error {
 	type result struct {
-		side string
-		id   discover.NodeID
-		err  error
+		side   string
+		pubkey *ecdsa.PublicKey
+		err    error
 	}
 	var (
 		prv0, _  = crypto.GenerateKey()
@@ -96,14 +97,12 @@ func testEncHandshake(token []byte) error {
 		defer func() { output <- r }()
 		defer fd0.Close()
 
-		dest := &discover.Node{ID: discover.PubkeyID(&prv1.PublicKey)}
-		r.id, r.err = c0.doEncHandshake(prv0, dest)
+		r.pubkey, r.err = c0.doEncHandshake(prv0, &prv1.PublicKey)
 		if r.err != nil {
 			return
 		}
-		id1 := discover.PubkeyID(&prv1.PublicKey)
-		if r.id != id1 {
-			r.err = fmt.Errorf("remote ID mismatch: got %v, want: %v", r.id, id1)
+		if !reflect.DeepEqual(r.pubkey, &prv1.PublicKey) {
+			r.err = fmt.Errorf("remote pubkey mismatch: got %v, want: %v", r.pubkey, &prv1.PublicKey)
 		}
 	}()
 	go func() {
@@ -111,13 +110,12 @@ func testEncHandshake(token []byte) error {
 		defer func() { output <- r }()
 		defer fd1.Close()
 
-		r.id, r.err = c1.doEncHandshake(prv1, nil)
+		r.pubkey, r.err = c1.doEncHandshake(prv1, nil)
 		if r.err != nil {
 			return
 		}
-		id0 := discover.PubkeyID(&prv0.PublicKey)
-		if r.id != id0 {
-			r.err = fmt.Errorf("remote ID mismatch: got %v, want: %v", r.id, id0)
+		if !reflect.DeepEqual(r.pubkey, &prv0.PublicKey) {
+			r.err = fmt.Errorf("remote ID mismatch: got %v, want: %v", r.pubkey, &prv0.PublicKey)
 		}
 	}()
 
@@ -149,17 +147,17 @@ func testEncHandshake(token []byte) error {
 func TestProtocolHandshake(t *testing.T) {
 	var (
 		prv0, _ = crypto.GenerateKey()
-		node0   = &discover.Node{ID: discover.PubkeyID(&prv0.PublicKey), IP: net.IP{1, 2, 3, 4}, TCP: 33}
-		hs0     = &protoHandshake{Version: 3, ID: node0.ID, Caps: []Cap{{"a", 0}, {"b", 2}}}
+		pub0    = crypto.FromECDSAPub(&prv0.PublicKey)[1:]
+		hs0     = &protoHandshake{Version: 3, ID: pub0, Caps: []Cap{{"a", 0}, {"b", 2}}}
 
 		prv1, _ = crypto.GenerateKey()
-		node1   = &discover.Node{ID: discover.PubkeyID(&prv1.PublicKey), IP: net.IP{5, 6, 7, 8}, TCP: 44}
-		hs1     = &protoHandshake{Version: 3, ID: node1.ID, Caps: []Cap{{"c", 1}, {"d", 3}}}
+		pub1    = crypto.FromECDSAPub(&prv1.PublicKey)[1:]
+		hs1     = &protoHandshake{Version: 3, ID: pub1, Caps: []Cap{{"c", 1}, {"d", 3}}}
 
 		wg sync.WaitGroup
 	)
 
-	fd0, fd1, err := tcpPipe()
+	fd0, fd1, err := pipes.TCPPipe()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,13 +167,13 @@ func TestProtocolHandshake(t *testing.T) {
 		defer wg.Done()
 		defer fd0.Close()
 		rlpx := newRLPX(fd0)
-		remid, err := rlpx.doEncHandshake(prv0, node1)
+		rpubkey, err := rlpx.doEncHandshake(prv0, &prv1.PublicKey)
 		if err != nil {
 			t.Errorf("dial side enc handshake failed: %v", err)
 			return
 		}
-		if remid != node1.ID {
-			t.Errorf("dial side remote id mismatch: got %v, want %v", remid, node1.ID)
+		if !reflect.DeepEqual(rpubkey, &prv1.PublicKey) {
+			t.Errorf("dial side remote pubkey mismatch: got %v, want %v", rpubkey, &prv1.PublicKey)
 			return
 		}
 
@@ -195,13 +193,13 @@ func TestProtocolHandshake(t *testing.T) {
 		defer wg.Done()
 		defer fd1.Close()
 		rlpx := newRLPX(fd1)
-		remid, err := rlpx.doEncHandshake(prv1, nil)
+		rpubkey, err := rlpx.doEncHandshake(prv1, nil)
 		if err != nil {
 			t.Errorf("listen side enc handshake failed: %v", err)
 			return
 		}
-		if remid != node0.ID {
-			t.Errorf("listen side remote id mismatch: got %v, want %v", remid, node0.ID)
+		if !reflect.DeepEqual(rpubkey, &prv0.PublicKey) {
+			t.Errorf("listen side remote pubkey mismatch: got %v, want %v", rpubkey, &prv0.PublicKey)
 			return
 		}
 
@@ -336,8 +334,8 @@ func TestRLPXFrameRW(t *testing.T) {
 	s1 := secrets{
 		AES:        aesSecret,
 		MAC:        macSecret,
-		EgressMAC:  sha3.NewKeccak256(),
-		IngressMAC: sha3.NewKeccak256(),
+		EgressMAC:  sha3.NewLegacyKeccak256(),
+		IngressMAC: sha3.NewLegacyKeccak256(),
 	}
 	s1.EgressMAC.Write(egressMACinit)
 	s1.IngressMAC.Write(ingressMACinit)
@@ -346,8 +344,8 @@ func TestRLPXFrameRW(t *testing.T) {
 	s2 := secrets{
 		AES:        aesSecret,
 		MAC:        macSecret,
-		EgressMAC:  sha3.NewKeccak256(),
-		IngressMAC: sha3.NewKeccak256(),
+		EgressMAC:  sha3.NewLegacyKeccak256(),
+		IngressMAC: sha3.NewLegacyKeccak256(),
 	}
 	s2.EgressMAC.Write(ingressMACinit)
 	s2.IngressMAC.Write(egressMACinit)
@@ -600,32 +598,4 @@ func TestHandshakeForwardCompatibility(t *testing.T) {
 	if !bytes.Equal(fooIngressHash, wantFooIngressHash) {
 		t.Errorf("ingress-mac('foo') mismatch:\ngot %x\nwant %x", fooIngressHash, wantFooIngressHash)
 	}
-}
-
-// tcpPipe creates an in process full duplex pipe based on a localhost TCP socket
-func tcpPipe() (net.Conn, net.Conn, error) {
-	l, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		return nil, nil, err
-	}
-	defer l.Close()
-
-	var aconn net.Conn
-	aerr := make(chan error, 1)
-	go func() {
-		var err error
-		aconn, err = l.Accept()
-		aerr <- err
-	}()
-
-	dconn, err := net.Dial("tcp", l.Addr().String())
-	if err != nil {
-		<-aerr
-		return nil, nil, err
-	}
-	if err := <-aerr; err != nil {
-		dconn.Close()
-		return nil, nil, err
-	}
-	return aconn, dconn, nil
 }

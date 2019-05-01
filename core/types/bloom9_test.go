@@ -54,7 +54,7 @@ func TestBloom(t *testing.T) {
 import (
 	"testing"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/core/state"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core/state"
 )
 
 func TestBloom9(t *testing.T) {

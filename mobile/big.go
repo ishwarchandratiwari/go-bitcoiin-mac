@@ -1,28 +1,28 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 // Contains all the wrappers from the math/big package.
 
-package bitcoiinGo
+package geth
 
 import (
 	"errors"
 	"math/big"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
 )
 
 // A BigInt represents a signed multi-precision integer.
@@ -83,6 +83,13 @@ func (bi *BigInt) SetString(x string, base int) {
 
 // BigInts represents a slice of big ints.
 type BigInts struct{ bigints []*big.Int }
+
+// NewBigInts creates a slice of uninitialized big numbers.
+func NewBigInts(size int) *BigInts {
+	return &BigInts{
+		bigints: make([]*big.Int, size),
+	}
+}
 
 // Size returns the number of big ints in the slice.
 func (bi *BigInts) Size() int {

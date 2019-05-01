@@ -29,9 +29,9 @@
 # - sign installer
 CRCCheck on
 
-!define GROUPNAME "Bitcoiin2g"
-!define APPNAME "BitcoiinGo"
-!define DESCRIPTION "Official Go implementation of the Bitcoiin2g protocol"
+!define GROUPNAME "Ethereum"
+!define APPNAME "Geth"
+!define DESCRIPTION "Official Go implementation of the Ethereum protocol"
 !addplugindir .\
 
 # Require admin rights on NT6+ (When UAC is turned on)

@@ -25,11 +25,11 @@ import (
 	"io/ioutil"
 	"math/big"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/accounts/abi/bind"
-	"github.com/bitcoiinBT2/go-bitcoiin/accounts/abi/bind/backends"
-	"github.com/bitcoiinBT2/go-bitcoiin/contracts/chequebook/contract"
-	"github.com/bitcoiinBT2/go-bitcoiin/core"
-	"github.com/bitcoiinBT2/go-bitcoiin/crypto"
+	"git.pirl.io/bitcoiin/go-bitcoiin/accounts/abi/bind"
+	"git.pirl.io/bitcoiin/go-bitcoiin/accounts/abi/bind/backends"
+	"git.pirl.io/bitcoiin/go-bitcoiin/contracts/chequebook/contract"
+	"git.pirl.io/bitcoiin/go-bitcoiin/core"
+	"git.pirl.io/bitcoiin/go-bitcoiin/crypto"
 )
 
 var (
@@ -40,7 +40,7 @@ var (
 )
 
 func main() {
-	backend := backends.NewSimulatedBackend(testAlloc)
+	backend := backends.NewSimulatedBackend(testAlloc, uint64(100000000))
 	auth := bind.NewKeyedTransactor(testKey)
 
 	// Deploy the contract, get the code.

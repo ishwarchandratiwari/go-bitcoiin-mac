@@ -1,18 +1,18 @@
-// Copyright 2014 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2014 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package event
 
@@ -141,7 +141,7 @@ func TestMuxConcurrent(t *testing.T) {
 	}
 }
 
-func emptySubscriber(mux *TypeMux, types ...interface{}) {
+func emptySubscriber(mux *TypeMux) {
 	s := mux.Subscribe(testEvent(0))
 	go func() {
 		for range s.Chan() {
@@ -182,9 +182,9 @@ func BenchmarkPost1000(b *testing.B) {
 func BenchmarkPostConcurrent(b *testing.B) {
 	var mux = new(TypeMux)
 	defer mux.Stop()
-	emptySubscriber(mux, testEvent(0))
-	emptySubscriber(mux, testEvent(0))
-	emptySubscriber(mux, testEvent(0))
+	emptySubscriber(mux)
+	emptySubscriber(mux)
+	emptySubscriber(mux)
 
 	var wg sync.WaitGroup
 	poster := func() {

@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package adapters
 
@@ -23,13 +23,14 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strconv"
 
 	"github.com/docker/docker/pkg/reexec"
-	"github.com/bitcoiinBT2/go-bitcoiin/crypto"
-	"github.com/bitcoiinBT2/go-bitcoiin/node"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p/discover"
-	"github.com/bitcoiinBT2/go-bitcoiin/rpc"
+	"git.pirl.io/bitcoiin/go-bitcoiin/crypto"
+	"git.pirl.io/bitcoiin/go-bitcoiin/node"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p/enode"
+	"git.pirl.io/bitcoiin/go-bitcoiin/rpc"
 )
 
 // Node represents a node in a simulation network which is created by a
@@ -77,7 +78,7 @@ type NodeAdapter interface {
 type NodeConfig struct {
 	// ID is the node's ID which is used to identify the node in the
 	// simulation network
-	ID discover.NodeID
+	ID enode.ID
 
 	// PrivateKey is the node's private key which is used by the devp2p
 	// stack to encrypt communications
@@ -96,25 +97,31 @@ type NodeConfig struct {
 	Services []string
 
 	// function to sanction or prevent suggesting a peer
-	Reachable func(id discover.NodeID) bool
+	Reachable func(id enode.ID) bool
+
+	Port uint16
 }
 
 // nodeConfigJSON is used to encode and decode NodeConfig as JSON by encoding
 // all fields as strings
 type nodeConfigJSON struct {
-	ID         string   `json:"id"`
-	PrivateKey string   `json:"private_key"`
-	Name       string   `json:"name"`
-	Services   []string `json:"services"`
+	ID              string   `json:"id"`
+	PrivateKey      string   `json:"private_key"`
+	Name            string   `json:"name"`
+	Services        []string `json:"services"`
+	EnableMsgEvents bool     `json:"enable_msg_events"`
+	Port            uint16   `json:"port"`
 }
 
 // MarshalJSON implements the json.Marshaler interface by encoding the config
 // fields as strings
 func (n *NodeConfig) MarshalJSON() ([]byte, error) {
 	confJSON := nodeConfigJSON{
-		ID:       n.ID.String(),
-		Name:     n.Name,
-		Services: n.Services,
+		ID:              n.ID.String(),
+		Name:            n.Name,
+		Services:        n.Services,
+		Port:            n.Port,
+		EnableMsgEvents: n.EnableMsgEvents,
 	}
 	if n.PrivateKey != nil {
 		confJSON.PrivateKey = hex.EncodeToString(crypto.FromECDSA(n.PrivateKey))
@@ -131,11 +138,9 @@ func (n *NodeConfig) UnmarshalJSON(data []byte) error {
 	}
 
 	if confJSON.ID != "" {
-		nodeID, err := discover.HexID(confJSON.ID)
-		if err != nil {
+		if err := n.ID.UnmarshalText([]byte(confJSON.ID)); err != nil {
 			return err
 		}
-		n.ID = nodeID
 	}
 
 	if confJSON.PrivateKey != "" {
@@ -152,8 +157,15 @@ func (n *NodeConfig) UnmarshalJSON(data []byte) error {
 
 	n.Name = confJSON.Name
 	n.Services = confJSON.Services
+	n.Port = confJSON.Port
+	n.EnableMsgEvents = confJSON.EnableMsgEvents
 
 	return nil
+}
+
+// Node returns the node descriptor represented by the config.
+func (n *NodeConfig) Node() *enode.Node {
+	return enode.NewV4(&n.PrivateKey.PublicKey, net.IP{127, 0, 0, 1}, int(n.Port), int(n.Port))
 }
 
 // RandomNodeConfig returns node configuration with a randomly generated ID and
@@ -163,13 +175,36 @@ func RandomNodeConfig() *NodeConfig {
 	if err != nil {
 		panic("unable to generate key")
 	}
-	var id discover.NodeID
-	pubkey := crypto.FromECDSAPub(&key.PublicKey)
-	copy(id[:], pubkey[1:])
-	return &NodeConfig{
-		ID:         id,
-		PrivateKey: key,
+
+	id := enode.PubkeyToIDV4(&key.PublicKey)
+	port, err := assignTCPPort()
+	if err != nil {
+		panic("unable to assign tcp port")
 	}
+	return &NodeConfig{
+		ID:              id,
+		Name:            fmt.Sprintf("node_%s", id.String()),
+		PrivateKey:      key,
+		Port:            port,
+		EnableMsgEvents: true,
+	}
+}
+
+func assignTCPPort() (uint16, error) {
+	l, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		return 0, err
+	}
+	l.Close()
+	_, port, err := net.SplitHostPort(l.Addr().String())
+	if err != nil {
+		return 0, err
+	}
+	p, err := strconv.ParseInt(port, 10, 32)
+	if err != nil {
+		return 0, err
+	}
+	return uint16(p), nil
 }
 
 // ServiceContext is a collection of options and methods which can be utilised
@@ -184,9 +219,9 @@ type ServiceContext struct {
 
 // RPCDialer is used when initialising services which need to connect to
 // other nodes in the network (for example a simulated Swarm node which needs
-// to connect to a BitcoiinGo node to resolve ENS names)
+// to connect to a Geth node to resolve ENS names)
 type RPCDialer interface {
-	DialRPC(id discover.NodeID) (*rpc.Client, error)
+	DialRPC(id enode.ID) (*rpc.Client, error)
 }
 
 // Services is a collection of services which can be run in a simulation

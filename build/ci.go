@@ -58,7 +58,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/internal/build"
+	"git.pirl.io/bitcoiin/go-bitcoiin/internal/build"
 )
 
 var (

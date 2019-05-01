@@ -1,18 +1,18 @@
-// Copyright 2017 The go-bitcoiin2g Authors
-// This file is part of go-bitcoiin2g.
+// Copyright 2017 The go-ethereum Authors
+// This file is part of go-ethereum.
 //
-// go-bitcoiin2g is free software: you can redistribute it and/or modify
+// go-ethereum is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// go-bitcoiin2g is distributed in the hope that it will be useful,
+// go-ethereum is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with go-bitcoiin2g. If not, see <http://www.gnu.org/licenses/>.
+// along with go-ethereum. If not, see <http://www.gnu.org/licenses/>.
 
 // This is a simple Whisper node. It could be used as a stand-alone bootstrap node.
 // Also, could be used for different test and diagnostics purposes.
@@ -35,16 +35,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/cmd/utils"
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
-	"github.com/bitcoiinBT2/go-bitcoiin/console"
-	"github.com/bitcoiinBT2/go-bitcoiin/crypto"
-	"github.com/bitcoiinBT2/go-bitcoiin/log"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p/discover"
-	"github.com/bitcoiinBT2/go-bitcoiin/p2p/nat"
-	"github.com/bitcoiinBT2/go-bitcoiin/whisper/mailserver"
-	whisper "github.com/bitcoiinBT2/go-bitcoiin/whisper/whisperv6"
+	"git.pirl.io/bitcoiin/go-bitcoiin/cmd/utils"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/console"
+	"git.pirl.io/bitcoiin/go-bitcoiin/crypto"
+	"git.pirl.io/bitcoiin/go-bitcoiin/log"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p/enode"
+	"git.pirl.io/bitcoiin/go-bitcoiin/p2p/nat"
+	"git.pirl.io/bitcoiin/go-bitcoiin/whisper/mailserver"
+	whisper "git.pirl.io/bitcoiin/go-bitcoiin/whisper/whisperv6"
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -140,8 +140,8 @@ func processArgs() {
 	}
 
 	if *asymmetricMode && len(*argPub) > 0 {
-		pub = crypto.ToECDSAPub(common.FromHex(*argPub))
-		if !isKeyValid(pub) {
+		var err error
+		if pub, err = crypto.UnmarshalPubkey(common.FromHex(*argPub)); err != nil {
 			utils.Fatalf("invalid public key")
 		}
 	}
@@ -175,7 +175,7 @@ func initialize() {
 	log.Root().SetHandler(log.LvlFilterHandler(log.Lvl(*argVerbosity), log.StreamHandler(os.Stderr, log.TerminalFormat(false))))
 
 	done = make(chan struct{})
-	var peers []*discover.Node
+	var peers []*enode.Node
 	var err error
 
 	if *generateKey {
@@ -203,7 +203,7 @@ func initialize() {
 		if len(*argEnode) == 0 {
 			argEnode = scanLineA("Please enter the peer's enode: ")
 		}
-		peer := discover.MustParseNode(*argEnode)
+		peer := enode.MustParseV4(*argEnode)
 		peers = append(peers, peer)
 	}
 
@@ -271,7 +271,9 @@ func initialize() {
 
 	if *mailServerMode {
 		shh.RegisterServer(&mailServer)
-		mailServer.Init(shh, *argDBPath, msPassword, *argServerPoW)
+		if err := mailServer.Init(shh, *argDBPath, msPassword, *argServerPoW); err != nil {
+			utils.Fatalf("Failed to init MailServer: %s", err)
+		}
 	}
 
 	server = &p2p.Server{
@@ -319,10 +321,6 @@ func startServer() error {
 	return nil
 }
 
-func isKeyValid(k *ecdsa.PublicKey) bool {
-	return k.X != nil && k.Y != nil
-}
-
 func configureNode() {
 	var err error
 	var p2pAccept bool
@@ -338,9 +336,8 @@ func configureNode() {
 			if b == nil {
 				utils.Fatalf("Error: can not convert hexadecimal string")
 			}
-			pub = crypto.ToECDSAPub(b)
-			if !isKeyValid(pub) {
-				utils.Fatalf("Error: invalid public key")
+			if pub, err = crypto.UnmarshalPubkey(b); err != nil {
+				utils.Fatalf("Error: invalid peer public key")
 			}
 		}
 	}
@@ -750,14 +747,14 @@ func requestExpiredMessagesLoop() {
 }
 
 func extractIDFromEnode(s string) []byte {
-	n, err := discover.ParseNode(s)
+	n, err := enode.ParseV4(s)
 	if err != nil {
 		utils.Fatalf("Failed to parse enode: %s", err)
 	}
-	return n.ID[:]
+	return n.ID().Bytes()
 }
 
-// obfuscateBloom adds 16 random bits to the the bloom
+// obfuscateBloom adds 16 random bits to the bloom
 // filter, in order to obfuscate the containing topics.
 // it does so deterministically within every session.
 // despite additional bits, it will match on average

@@ -1,18 +1,18 @@
-// Copyright 2016 The go-bitcoiin2g Authors
-// This file is part of the go-bitcoiin2g library.
+// Copyright 2016 The go-ethereum Authors
+// This file is part of the go-ethereum library.
 //
-// The go-bitcoiin2g library is free software: you can redistribute it and/or modify
+// The go-ethereum library is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// The go-bitcoiin2g library is distributed in the hope that it will be useful,
+// The go-ethereum library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with the go-bitcoiin2g library. If not, see <http://www.gnu.org/licenses/>.
+// along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
 package whisperv6
 
@@ -24,7 +24,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bitcoiinBT2/go-bitcoiin/common"
+	"git.pirl.io/bitcoiin/go-bitcoiin/common"
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -465,27 +465,34 @@ func TestExpiry(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed generateMessageParams with seed %d: %s.", seed, err)
 	}
-
 	params.TTL = 1
-	msg, err := NewSentMessage(params)
-	if err != nil {
-		t.Fatalf("failed to create new message with seed %d: %s.", seed, err)
-	}
-	env, err := msg.Wrap(params)
-	if err != nil {
-		t.Fatalf("failed Wrap with seed %d: %s.", seed, err)
-	}
 
-	err = w.Send(env)
-	if err != nil {
-		t.Fatalf("failed to send envelope with seed %d: %s.", seed, err)
+	messagesCount := 5
+
+	// Send a few messages one after another. Due to low PoW and expiration buckets
+	// with one second resolution, it covers a case when there are multiple items
+	// in a single expiration bucket.
+	for i := 0; i < messagesCount; i++ {
+		msg, err := NewSentMessage(params)
+		if err != nil {
+			t.Fatalf("failed to create new message with seed %d: %s.", seed, err)
+		}
+		env, err := msg.Wrap(params)
+		if err != nil {
+			t.Fatalf("failed Wrap with seed %d: %s.", seed, err)
+		}
+
+		err = w.Send(env)
+		if err != nil {
+			t.Fatalf("failed to send envelope with seed %d: %s.", seed, err)
+		}
 	}
 
 	// wait till received or timeout
 	var received, expired bool
 	for j := 0; j < 20; j++ {
 		time.Sleep(100 * time.Millisecond)
-		if len(w.Envelopes()) > 0 {
+		if len(w.Envelopes()) == messagesCount {
 			received = true
 			break
 		}
